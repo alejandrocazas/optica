@@ -4,179 +4,61 @@ if ($_SESSION["perfil"] == "Especial") {
   return;
 }
 
-$fechaActual = new DateTime();
-$nombre = $_SESSION["nombre"] ?? '';
-$apellido = $_SESSION["apellido"] ?? '';
-$nombreCompleto = trim($nombre . ' ' . $apellido);
-$nombreParaMostrar = $nombreCompleto !== '' ? $nombreCompleto : ($nombre !== '' ? $nombre : 'Usuario');
-$nombreComercial = "Óptica Oftalens";
-$fotoUsuario = !empty($_SESSION["foto"]) ? $_SESSION["foto"] : "vistas/img/usuarios/default/anonymous.png";
+$nombreUsuario = $_SESSION["nombre"] ?? '';
+$nombreUsuarioUpper = function_exists('mb_strtoupper')
+  ? mb_strtoupper($nombreUsuario, 'UTF-8')
+  : strtoupper($nombreUsuario);
+$nombreOpticaUpper = function_exists('mb_strtoupper')
+  ? mb_strtoupper('Óptica Oftalens', 'UTF-8')
+  : strtoupper('Óptica Oftalens');
 
-$horaActual = (int) $fechaActual->format('H');
-if ($horaActual < 12) {
-  $saludo = 'Buenos días';
-} elseif ($horaActual < 18) {
-  $saludo = 'Buenas tardes';
-} else {
-  $saludo = 'Buenas noches';
-}
-
-$diasSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
-$mesesAno = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-$indiceDia = (int) $fechaActual->format('w');
-$indiceMes = (int) $fechaActual->format('n') - 1;
-$fechaLarga = ucfirst($diasSemana[$indiceDia]) . ' ' . $fechaActual->format('d') . ' de ' . $mesesAno[$indiceMes] . ' de ' . $fechaActual->format('Y');
-$horaFormateada = $fechaActual->format('H:i');
-
-$accesosRapidos = [
-  ["ruta" => "crear-venta", "icono" => "fa-handshake-o",   "texto" => "Crear venta",   "detalle" => "Inicia una nueva transacción"],
-  ["ruta" => "ventas",      "icono" => "fa-shopping-cart", "texto" => "Ventas",        "detalle" => "Revisa movimientos recientes"],
-  ["ruta" => "productos",   "icono" => "fa-product-hunt",  "texto" => "Productos",     "detalle" => "Actualiza el inventario"],
-  ["ruta" => "clientes",    "icono" => "fa-users",         "texto" => "Clientes",      "detalle" => "Gestiona tu cartera"],
-  ["ruta" => "historias",   "icono" => "fa-file-text-o",   "texto" => "Historias",     "detalle" => "Consulta expedientes clínicos"],
-  ["ruta" => "usuarios",    "icono" => "fa-user-circle-o", "texto" => "Usuarios",      "detalle" => "Control de accesos"],
+$modulos = [
+  ["ruta" => "productos",   "icono" => "fa-product-hunt",  "texto" => "Productos"],
+  ["ruta" => "crear-venta", "icono" => "fa-handshake-o",   "texto" => "Crear Venta"],
+  ["ruta" => "ventas",      "icono" => "fa-shopping-cart", "texto" => "Ventas"],
+  ["ruta" => "clientes",    "icono" => "fa-users",         "texto" => "Clientes"],
+  ["ruta" => "historias",   "icono" => "fa-file-text-o",   "texto" => "Historias"],
+  ["ruta" => "usuarios",    "icono" => "fa-user-circle-o", "texto" => "Usuarios"],
 ];
-
-$estado = null;
-$valorEstado = null;
-$alertas = ControladorAlerta::ctrMostrarAlerta($estado, $valorEstado);
-$alertasRecientes = [];
-
-if (is_array($alertas)) {
-  foreach ($alertas as $alerta) {
-    $alertasRecientes[] = [
-      'autor' => $alerta['autor'] ?? '',
-      'fecha' => $alerta['fecha'] ?? '',
-      'mensaje' => $alerta['mensaje'] ?? '',
-    ];
-
-    if (count($alertasRecientes) === 4) {
-      break;
-    }
-  }
-}
-
-$totalAlertasResumen = count($alertasRecientes);
 ?>
 
-<div class="content-wrapper inicio-dashboard">
+<div class="content-wrapper inicio-clasico">
 
   <section class="content-header">
-    <h1>
-      Inicio
-      <small>Panel principal</small>
-    </h1>
-    <ol class="breadcrumb">
-      <li><a href="inicio"><i class="fa fa-dashboard"></i> Inicio</a></li>
-      <li class="active">Panel</li>
-    </ol>
+    <h1>Inicio <small>Bienvenido</small></h1>
   </section>
 
   <section class="content">
 
-    <div class="row">
-      <div class="col-lg-8 col-xs-12">
-        <div class="box box-primary box-welcome">
-          <div class="box-body">
-            <div class="box-welcome-avatar">
-              <img src="<?= htmlspecialchars($fotoUsuario); ?>" alt="Foto de perfil">
-            </div>
-            <div class="box-welcome-text">
-              <span class="box-welcome-greeting"><?= htmlspecialchars($saludo); ?></span>
-              <h2 class="box-welcome-name"><?= htmlspecialchars($nombreParaMostrar); ?></h2>
-              <p class="box-welcome-meta">
-                <?= htmlspecialchars($nombreComercial); ?> &bull; <?= htmlspecialchars($fechaLarga); ?>
-              </p>
-              <small class="box-welcome-time">Hora actual: <?= htmlspecialchars($horaFormateada); ?></small>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-4 col-xs-12">
-        <div class="box box-warning box-alert-summary">
-          <div class="box-header with-border">
-            <h3 class="box-title"><i class="fa fa-bell-o"></i> Últimas alertas</h3>
-            <div class="box-tools pull-right">
-              <span class="label label-warning"><?= (int) $totalAlertasResumen; ?></span>
-              <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-            </div>
-          </div>
-          <div class="box-body">
-            <?php if (!empty($alertasRecientes)): ?>
-              <ul class="alert-summary-list">
-                <?php foreach ($alertasRecientes as $alerta): ?>
-                  <li>
-                    <span class="alert-summary-message"><?= htmlspecialchars($alerta['mensaje']); ?></span>
-                    <small class="alert-summary-meta">
-                      <i class="fa fa-user"></i> <?= htmlspecialchars($alerta['autor'] ?: 'Sistema'); ?>
-                      &middot;
-                      <i class="fa fa-clock-o"></i> <?= htmlspecialchars($alerta['fecha']); ?>
-                    </small>
-                  </li>
-                <?php endforeach; ?>
-              </ul>
-            <?php else: ?>
-              <p class="text-muted text-center">No hay alertas pendientes por ahora.</p>
-            <?php endif; ?>
-          </div>
-          <div class="box-footer text-center">
-            <a href="reportes" class="text-muted">Ver historial de alertas</a>
-          </div>
-        </div>
-      </div>
+    <div class="bienvenida-box text-center">
+      <h3>BIENVENID@</h3>
+      <h2><?= htmlspecialchars($nombreUsuarioUpper); ?></h2>
+      <div class="logo-optica"><?= htmlspecialchars($nombreOpticaUpper); ?></div>
     </div>
 
     <div class="row">
-      <?php include "inicio/cajas-superiores.php"; ?>
-    </div>
-
-    <div class="row">
-      <div class="col-lg-8 col-xs-12">
-        <div class="box box-default box-quick-links">
-          <div class="box-header with-border">
-            <h3 class="box-title"><i class="fa fa-bolt"></i> Accesos rápidos</h3>
-          </div>
-          <div class="box-body">
-            <div class="row">
-              <?php foreach ($accesosRapidos as $acceso): ?>
-                <div class="col-sm-4 col-xs-6">
-                  <a class="quick-link-card" href="<?= htmlspecialchars($acceso['ruta']); ?>">
-                    <span class="quick-link-icon"><i class="fa <?= htmlspecialchars($acceso['icono']); ?>"></i></span>
-                    <span class="quick-link-text"><?= htmlspecialchars($acceso['texto']); ?></span>
-                    <?php if (!empty($acceso['detalle'])): ?>
-                      <small class="quick-link-detail"><?= htmlspecialchars($acceso['detalle']); ?></small>
-                    <?php endif; ?>
-                  </a>
+      <div class="col-md-9">
+        <div class="row text-center">
+          <?php foreach ($modulos as $modulo): ?>
+            <div class="col-sm-4 col-xs-6">
+              <a href="<?= htmlspecialchars($modulo['ruta']); ?>">
+                <div class="btn-modern">
+                  <i class="fa <?= htmlspecialchars($modulo['icono']); ?>"></i>
+                  <span><?= htmlspecialchars($modulo['texto']); ?></span>
                 </div>
-              <?php endforeach; ?>
+              </a>
             </div>
-          </div>
+          <?php endforeach; ?>
         </div>
-
-        <?php include "inicio/productos-recientes.php"; ?>
       </div>
 
-      <div class="col-lg-4 col-xs-12">
-        <div class="box box-success box-calendar">
+      <div class="col-md-3">
+        <div class="box box-success">
           <div class="box-header with-border">
-            <h3 class="box-title"><i class="fa fa-calendar"></i> Agenda</h3>
+            <h3 class="box-title"><i class="fa fa-calendar"></i> Calendario</h3>
           </div>
           <div class="box-body">
-            <div id="dashboard-calendar"></div>
-          </div>
-        </div>
-
-        <div class="box box-info box-suggestions hidden-xs">
-          <div class="box-header with-border">
-            <h3 class="box-title"><i class="fa fa-lightbulb-o"></i> Sugerencias</h3>
-          </div>
-          <div class="box-body">
-            <ul class="suggestion-list">
-              <li><i class="fa fa-eye text-blue"></i> Confirma las citas oftalmológicas programadas.</li>
-              <li><i class="fa fa-line-chart text-green"></i> Revisa las ventas de la semana.</li>
-              <li><i class="fa fa-cubes text-purple"></i> Controla el stock de monturas y lentes.</li>
-            </ul>
+            <div id="calendar"></div>
           </div>
         </div>
       </div>
@@ -187,6 +69,22 @@ $totalAlertasResumen = count($alertasRecientes);
 </div>
 
 <script>
+(function persistSidebarState() {
+  var key = 'lte2-sidebar-collapsed';
+  var saved = localStorage.getItem(key);
+  if (saved === '1') {
+    document.body.classList.add('sidebar-collapse');
+  }
+  if (typeof jQuery !== 'undefined') {
+    jQuery(document).on('click', '[data-toggle="push-menu"]', function () {
+      setTimeout(function () {
+        var collapsed = document.body.classList.contains('sidebar-collapse');
+        localStorage.setItem(key, collapsed ? '1' : '0');
+      }, 150);
+    });
+  }
+})();
+
 (function ensureFullCalendarStyles() {
   var fcCssId = 'fullcalendar-css';
   if (!document.getElementById(fcCssId)) {
@@ -201,20 +99,15 @@ $totalAlertasResumen = count($alertasRecientes);
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  var calendarEl = document.getElementById('dashboard-calendar');
-  if (!calendarEl) {
+  var calendarEl = document.getElementById('calendar');
+  if (!calendarEl || typeof FullCalendar === 'undefined') {
     return;
   }
 
   var calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'dayGridMonth',
-    locale: 'es',
-    height: 350,
-    headerToolbar: {
-      left: 'title',
-      center: '',
-      right: 'prev,next'
-    }
+    contentHeight: 350,
+    locale: 'es'
   });
 
   calendar.render();

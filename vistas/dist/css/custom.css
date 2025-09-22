@@ -19,179 +19,79 @@
   }
 }
 
+.main-header .navbar .navbar-brand {
+  font-weight: 600;
+  color: #f4f6f9;
+  background: transparent;
+  padding: 0 10px;
+}
+
 /* ========================
-   DASHBOARD INICIO
+   INICIO CLÁSICO
    ======================== */
-.inicio-dashboard .box-welcome {
-  border-radius: 18px;
-  overflow: hidden;
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
-}
-
-.inicio-dashboard .box-welcome .box-body {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  padding: 28px 30px;
-  background: linear-gradient(135deg, #1e3c72, #2a5298);
+.inicio-clasico .bienvenida-box {
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
   color: #fff;
+  text-align: center;
+  padding: 30px 10px;
+  margin-bottom: 30px;
+  border-radius: 15px;
 }
 
-.inicio-dashboard .box-welcome-avatar img {
-  width: 82px;
-  height: 82px;
-  border-radius: 50%;
-  border: 3px solid rgba(255, 255, 255, 0.65);
-  object-fit: cover;
+.inicio-clasico .bienvenida-box h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 18px;
+  letter-spacing: 1.5px;
 }
 
-.inicio-dashboard .box-welcome-text {
-  flex: 1;
-}
-
-.inicio-dashboard .box-welcome-greeting {
-  text-transform: uppercase;
-  font-size: 13px;
-  letter-spacing: 1px;
-  opacity: 0.8;
-}
-
-.inicio-dashboard .box-welcome-name {
-  margin: 6px 0;
-  font-size: 30px;
+.inicio-clasico .bienvenida-box h2 {
+  margin: 0 0 10px 0;
+  font-size: 32px;
   font-weight: 700;
 }
 
-.inicio-dashboard .box-welcome-meta {
-  margin-bottom: 4px;
-  font-size: 15px;
-  opacity: 0.9;
+.inicio-clasico .logo-optica {
+  font-size: 22px;
+  font-weight: 700;
+  margin-top: 10px;
+  letter-spacing: 1px;
 }
 
-.inicio-dashboard .box-welcome-time {
-  display: inline-block;
-  font-size: 12px;
-  opacity: 0.75;
-}
-
-@media (max-width: 991px) {
-  .inicio-dashboard .box-welcome .box-body {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .inicio-dashboard .box-welcome-text {
-    align-items: center;
-  }
-}
-
-.inicio-dashboard .box-alert-summary .box-body {
-  max-height: 260px;
-  overflow-y: auto;
-  padding: 18px 22px;
-}
-
-.inicio-dashboard .alert-summary-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.inicio-dashboard .alert-summary-list li {
-  padding: 10px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.inicio-dashboard .alert-summary-list li:last-child {
-  border-bottom: none;
-}
-
-.inicio-dashboard .alert-summary-message {
-  display: block;
-  font-weight: 600;
-  color: #8a6d3b;
-}
-
-.inicio-dashboard .alert-summary-meta {
-  display: block;
-  margin-top: 4px;
-  font-size: 12px;
-  color: #8c8c8c;
-}
-
-.inicio-dashboard .box-quick-links .box-body {
-  padding-bottom: 25px;
-}
-
-.inicio-dashboard .quick-link-card {
+.inicio-clasico .btn-modern {
+  width: 160px;
+  height: 160px;
+  margin: 20px auto;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  min-height: 160px;
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  transition: all 0.3s ease;
   border: 3px solid transparent;
-  padding: 20px;
   text-decoration: none;
-  color: inherit;
 }
 
-.inicio-dashboard .quick-link-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 16px 28px rgba(0, 0, 0, 0.15);
-  border-color: #3c8dbc;
-}
-
-.inicio-dashboard .quick-link-icon {
-  display: block;
-  font-size: 34px;
+.inicio-clasico .btn-modern i {
+  font-size: 40px;
   color: #0072ff;
-  margin-bottom: 12px;
-}
-
-.inicio-dashboard .quick-link-text {
-  font-size: 15px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-}
-
-.inicio-dashboard .quick-link-detail {
-  margin-top: 6px;
-  color: #777;
-  text-align: center;
-}
-
-.inicio-dashboard .box-calendar #dashboard-calendar {
-  min-height: 340px;
-}
-
-.inicio-dashboard .box-suggestions .suggestion-list {
-  list-style: none;
-  margin: 0;
-  padding-left: 0;
-}
-
-.inicio-dashboard .box-suggestions .suggestion-list li {
   margin-bottom: 10px;
-  color: #555;
 }
 
-.inicio-dashboard .box-suggestions .suggestion-list i {
-  margin-right: 8px;
+.inicio-clasico .btn-modern span {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
 }
 
-@media (max-width: 767px) {
-  .inicio-dashboard .quick-link-card {
-    min-height: 140px;
-    margin-bottom: 15px;
-  }
+.inicio-clasico .btn-modern:hover {
+  transform: translateY(-8px);
+  border-color: #0072ff;
+}
 
-  .inicio-dashboard .box-alert-summary .box-body {
-    max-height: none;
-  }
+.inicio-clasico #calendar {
+  height: 350px;
+  font-size: 12px;
 }

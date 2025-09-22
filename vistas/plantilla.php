@@ -36,9 +36,12 @@ session_start();
 
   <!-- Theme style -->
   <link rel="stylesheet" href="vistas/dist/css/AdminLTE.css">
-  
+
   <!-- AdminLTE Skins -->
   <link rel="stylesheet" href="vistas/dist/css/skins/_all-skins.min.css">
+
+  <!-- Custom overrides -->
+  <link rel="stylesheet" href="vistas/dist/css/custom.css">
 
   <!-- Google Font -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
@@ -59,10 +62,7 @@ session_start();
   <!--CSS DESPLIEGUE RUT-->
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.18/css/AdminLTE.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.18/css/skins/skin-blue.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css">
+  
 
 
   <!--=====================================
@@ -113,13 +113,6 @@ session_start();
 
   <!-- ChartJS http://www.chartjs.org/-->
   <script src="vistas/bower_components/Chart.js/Chart.js"></script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.18/js/adminlte.min.js"></script>
-
-
-
 
 </head>
 

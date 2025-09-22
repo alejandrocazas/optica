@@ -1,26 +1,168 @@
 /* Estilos personalizados para Óptica Oftalens */
 
-.inicio-dashboard .bienvenida-box {
-  background: linear-gradient(135deg, #00c6ff, #0072ff);
-  color: #fff;
-  padding: 30px 20px;
+.main-header .navbar .navbar-section-title {
+  display: inline-block;
+  margin-left: 15px;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #f4f6f9;
+}
+
+@media (max-width: 767px) {
+  .main-header .navbar .navbar-section-title {
+    display: none;
+  }
+}
+
+.main-header .navbar .quick-actions-menu .dropdown-menu {
+  width: 260px;
+  padding-bottom: 10px;
+}
+
+.main-header .navbar .quick-actions-menu .header {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: #777;
+  padding: 12px 15px 0;
+}
+
+.main-header .navbar .quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(110px, 1fr));
+  gap: 12px;
+  padding: 12px 15px 18px;
+}
+
+.main-header .navbar .quick-actions-grid a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  color: #3c8dbc;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.main-header .navbar .quick-actions-grid a:hover {
+  background: #f4f6f9;
+  border-color: #3c8dbc;
+}
+
+.main-header .navbar .quick-actions-grid i {
+  font-size: 20px;
+  margin-bottom: 6px;
+}
+
+.inicio-dashboard .bienvenida-card {
   border-radius: 18px;
-  margin-bottom: 30px;
-  text-align: center;
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
 }
 
-.inicio-dashboard .bienvenida-box h2 {
-  font-size: 32px;
-  font-weight: 700;
-  margin: 5px 0 0;
+.inicio-dashboard .bienvenida-card .box-body {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 28px 30px;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  color: #fff;
+}
+
+.inicio-dashboard .bienvenida-avatar img {
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.65);
+  object-fit: cover;
+}
+
+.inicio-dashboard .bienvenida-texto {
+  flex: 1;
+}
+
+.inicio-dashboard .bienvenida-saludo {
+  text-transform: uppercase;
+  font-size: 13px;
   letter-spacing: 1px;
+  opacity: 0.8;
 }
 
-.inicio-dashboard .bienvenida-box p {
+.inicio-dashboard .bienvenida-nombre {
+  margin: 6px 0;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.inicio-dashboard .bienvenida-detalle {
   margin: 0;
-  font-size: 16px;
+  font-size: 15px;
   opacity: 0.9;
+}
+
+.inicio-dashboard .bienvenida-reloj {
+  text-align: right;
+}
+
+.inicio-dashboard .bienvenida-reloj .hora {
+  display: block;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.inicio-dashboard .bienvenida-reloj small {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.inicio-dashboard .box-alertas-resumen .box-body {
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 18px 22px;
+}
+
+.inicio-dashboard .alertas-resumen-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.inicio-dashboard .alertas-resumen-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.inicio-dashboard .alertas-resumen-list li:last-child {
+  border-bottom: none;
+}
+
+.inicio-dashboard .alerta-mensaje {
+  display: block;
+  font-weight: 600;
+  color: #8a6d3b;
+}
+
+.inicio-dashboard .alerta-meta {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+.inicio-dashboard .box-accesos .box-header {
+  border-bottom: 0;
+}
+
+.inicio-dashboard .box-accesos .box-body {
+  padding-bottom: 25px;
 }
 
 .inicio-dashboard .accesos-rapidos {
@@ -33,13 +175,13 @@
   justify-content: center;
   align-items: center;
   width: 100%;
-  min-height: 160px;
+  min-height: 170px;
   background: #fff;
   border-radius: 20px;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   border: 3px solid transparent;
-  padding: 20px;
+  padding: 22px;
   text-decoration: none;
   color: inherit;
 }
@@ -56,6 +198,16 @@
   color: #333;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+.inicio-dashboard .accesos-rapidos .acceso-card small {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: #666;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 500;
 }
 
 .inicio-dashboard .accesos-rapidos .acceso-card:hover {
@@ -79,22 +231,55 @@
   font-weight: 600;
 }
 
+.inicio-dashboard .box-sugerencias .box-body {
+  padding: 18px 20px;
+}
+
+.inicio-dashboard .sugerencias-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.inicio-dashboard .sugerencias-list li {
+  padding: 8px 0;
+  font-size: 13px;
+  color: #444;
+}
+
+.inicio-dashboard .sugerencias-list i {
+  width: 18px;
+  text-align: center;
+  margin-right: 6px;
+}
+
+@media (max-width: 1199px) {
+  .inicio-dashboard .bienvenida-card .box-body {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .inicio-dashboard .bienvenida-reloj {
+    display: none;
+  }
+}
+
 @media (max-width: 991px) {
   .inicio-dashboard .accesos-rapidos .col-sm-4 {
     margin-bottom: 20px;
   }
+
+  .inicio-dashboard .box-alertas-resumen .box-body {
+    max-height: none;
+  }
 }
 
 @media (max-width: 767px) {
-  .inicio-dashboard .bienvenida-box {
-    padding: 25px 15px;
-  }
-
-  .inicio-dashboard .bienvenida-box h2 {
-    font-size: 24px;
+  .inicio-dashboard .bienvenida-card .box-body {
+    padding: 24px 20px;
   }
 
   .inicio-dashboard .accesos-rapidos .acceso-card {
-    min-height: 140px;
+    min-height: 150px;
   }
 }

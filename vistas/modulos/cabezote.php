@@ -1,45 +1,44 @@
 <!-- ===== HEADER (AdminLTE 2) CORREGIDO ===== -->
 <?php
-$rutaActual = $_GET["ruta"] ?? "inicio";
+// Asegura la sesión iniciada en el bootstrap global.
+if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
+
+// Ruta actual (sanitizada)
+$rutaActualRaw = $_GET['ruta'] ?? 'inicio';
+$rutaActual = preg_replace('~[^a-z0-9\-]~i', '', $rutaActualRaw);
 
 $mapaTitulos = [
-  "inicio" => "Panel principal",
-  "usuarios" => "Usuarios",
-  "categorias" => "Categorías",
-  "productos" => "Productos",
-  "clientes" => "Clientes",
-  "ventas" => "Ventas",
-  "crear-venta" => "Crear venta",
-  "editar-venta" => "Editar venta",
-  "reportes" => "Reportes",
-  "historias" => "Historias clínicas",
-  "configuraciones" => "Configuraciones",
-  "proveedores" => "Proveedores",
+  'inicio'           => 'Panel principal',
+  'usuarios'         => 'Usuarios',
+  'categorias'       => 'Categorías',
+  'productos'        => 'Productos',
+  'clientes'         => 'Clientes',
+  'ventas'           => 'Ventas',
+  'crear-venta'      => 'Crear venta',
+  'editar-venta'     => 'Editar venta',
+  'reportes'         => 'Reportes',
+  'historias'        => 'Historias clínicas',
+  'configuraciones'  => 'Configuraciones',
+  'proveedores'      => 'Proveedores',
 ];
 
 $tituloSeccion = $mapaTitulos[$rutaActual] ?? ucwords(str_replace('-', ' ', $rutaActual));
 $tituloSeccion = trim($tituloSeccion) !== '' ? $tituloSeccion : 'Panel principal';
 
-$nombreSesion = $_SESSION["nombre"] ?? '';
-$apellidoSesion = $_SESSION["apellido"] ?? '';
-$nombreUsuario = trim($nombreSesion . ' ' . $apellidoSesion);
-$nombreUsuario = $nombreUsuario !== '' ? $nombreUsuario : ($nombreSesion !== '' ? $nombreSesion : 'Usuario');
-$perfilUsuario = $_SESSION["perfil"] ?? '';
-$fotoUsuario = !empty($_SESSION["foto"]) ? $_SESSION["foto"] : 'vistas/img/usuarios/default/anonymous.png';
+$nombreSesion   = $_SESSION['nombre']   ?? '';
+$apellidoSesion = $_SESSION['apellido'] ?? '';
+$perfilUsuario  = $_SESSION['perfil']   ?? '';
+$fotoUsuario    = !empty($_SESSION['foto']) ? $_SESSION['foto'] : 'vistas/img/usuarios/default/anonymous.png';
+$nombreUsuario  = trim($nombreSesion.' '.$apellidoSesion);
+if ($nombreUsuario === '') { $nombreUsuario = ($nombreSesion !== '' ? $nombreSesion : 'Usuario'); }
 
-$estadoNotificacion = null;
-$valorNotificacion = null;
-$listadoNotificaciones = ControladorCount::ctrMostrarCount($estadoNotificacion, $valorNotificacion);
-$totalNotificaciones = is_array($listadoNotificaciones) ? count($listadoNotificaciones) : 0;
-
-$itemAlerta = null;
-$valorAlerta = null;
-$alertasCabecera = ControladorAlerta::ctrMostrarAlerta($itemAlerta, $valorAlerta);
+// Notificaciones: usa una única fuente para badge y listado
+$alertasCabecera = ControladorAlerta::ctrMostrarAlerta(null, null);
 $alertasCabecera = is_array($alertasCabecera) ? $alertasCabecera : [];
+$totalNotificaciones = count($alertasCabecera);
 ?>
 
 <header class="main-header">
-
   <!-- Logo -->
   <a href="inicio" class="logo">
     <span class="logo-mini"><b>O</b>O</span>
@@ -48,70 +47,41 @@ $alertasCabecera = is_array($alertasCabecera) ? $alertasCabecera : [];
 
   <!-- Navbar -->
   <nav class="navbar navbar-static-top" role="navigation">
-
     <!-- Botón hamburguesa: abre/cierra el sidebar AdminLTE -->
     <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button" aria-label="Abrir menú">
       <span class="sr-only">Toggle navigation</span>
     </a>
 
-    <!-- DERECHA: Notificaciones y Perfil -->
-    <span class="navbar-page-title hidden-xs"><?= htmlspecialchars($tituloSeccion); ?></span>
+    <!-- Título de la página -->
+    <span class="navbar-page-title hidden-xs"><?= htmlspecialchars($tituloSeccion, ENT_QUOTES, 'UTF-8'); ?></span>
 
+    <!-- DERECHA: Notificaciones y Perfil -->
     <div class="navbar-custom-menu">
       <ul class="nav navbar-nav">
 
         <!-- 🔔 Notificaciones -->
         <li class="dropdown notifications-menu">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fa fa-bell"></i>
-            <?php
-              $estado = null; $valorestado = null;
-              $mostrarCount = ControladorCount::ctrMostrarCount($estado, $valorestado);
-              $count = is_array($mostrarCount) ? count($mostrarCount) : 0;
-              if ($count > 0) echo '<span class="label label-danger">'.$count.'</span>';
-            ?>
+            <i class="fa fa-bell" aria-hidden="true"></i>
             <?php if ($totalNotificaciones > 0): ?>
-              <span class="label label-danger"><?= (int) $totalNotificaciones; ?></span>
+              <span class="label label-danger"><?= (int)$totalNotificaciones; ?></span>
             <?php endif; ?>
           </a>
           <ul class="dropdown-menu">
             <li class="header">Notificaciones</li>
             <li>
               <ul class="menu" style="max-height:360px; overflow:auto">
-                <?php
-                  $item = null; $valor = null;
-                  $mostrarAlerta = ControladorAlerta::ctrMostrarAlerta($item, $valor);
-                  if ($count > 0 && is_array($mostrarAlerta)) {
-                    foreach ($mostrarAlerta as $value) {
-                      $autor   = htmlspecialchars($value["autor"]   ?? '');
-                      $fecha   = htmlspecialchars($value["fecha"]   ?? '');
-                      $mensaje = htmlspecialchars($value["mensaje"] ?? '');
-                      echo '<li>
-                              <a href="#">
-                                <i class="fa fa-info-circle text-aqua"></i>
-                                <strong>'.$autor.'</strong>
-                                <small class="pull-right text-muted">'.$fecha.'</small><br>
-                                <span class="text-muted">'.$mensaje.'</span>
-                              </a>
-                            </li>';
-                    }
-                  } else {
-                    echo '<li><a href="#"><span class="text-muted">No hay notificaciones</span></a></li>';
-                  }
-                ?>
-              <ul class="menu" style="max-height: 320px; overflow: auto;">
-                <?php if ($totalNotificaciones > 0 && !empty($alertasCabecera)): ?>
-                  <?php foreach ($alertasCabecera as $indice => $alerta): ?>
-                    <?php if ($indice >= 6) { break; } ?>
+                <?php if ($totalNotificaciones > 0): ?>
+                  <?php foreach ($alertasCabecera as $i => $alerta): ?>
+                    <?php if ($i >= 6) break; // mostramos máx. 6 ?>
                     <?php
-                      $autor = htmlspecialchars($alerta['autor'] ?? 'Sistema');
-                      $fecha = htmlspecialchars($alerta['fecha'] ?? '');
-                      $mensaje = htmlspecialchars($alerta['mensaje'] ?? '');
+                      $autor   = htmlspecialchars($alerta['autor']   ?? 'Sistema', ENT_QUOTES, 'UTF-8');
+                      $fecha   = htmlspecialchars($alerta['fecha']   ?? '', ENT_QUOTES, 'UTF-8');
+                      $mensaje = htmlspecialchars($alerta['mensaje'] ?? '', ENT_QUOTES, 'UTF-8');
                     ?>
                     <li>
                       <a href="#">
-                        <i class="fa fa-info-circle text-aqua"></i>
+                        <i class="fa fa-info-circle text-aqua" aria-hidden="true"></i>
                         <strong><?= $autor; ?></strong>
                         <small class="pull-right text-muted"><?= $fecha; ?></small><br>
                         <span class="text-muted"><?= $mensaje; ?></span>
@@ -129,35 +99,19 @@ $alertasCabecera = is_array($alertasCabecera) ? $alertasCabecera : [];
 
         <!-- 👤 Perfil de usuario -->
         <li class="dropdown user user-menu">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-            <?php if (!empty($_SESSION["foto"])): ?>
-              <img src="<?= htmlspecialchars($_SESSION["foto"]); ?>" class="user-image" alt="User Image">
-            <?php else: ?>
-              <img src="vistas/img/usuarios/default/anonymous.png" class="user-image" alt="User Image">
-            <?php endif; ?>
-            <span class="hidden-xs"><?= htmlspecialchars($_SESSION["nombre"]); ?></span>
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <img src="<?= htmlspecialchars($fotoUsuario); ?>" class="user-image" alt="Foto de usuario">
-            <span class="hidden-xs"><?= htmlspecialchars($nombreUsuario); ?></span>
+            <img src="<?= htmlspecialchars($fotoUsuario, ENT_QUOTES, 'UTF-8'); ?>" class="user-image" alt="Foto de usuario">
+            <span class="hidden-xs"><?= htmlspecialchars($nombreUsuario, ENT_QUOTES, 'UTF-8'); ?></span>
           </a>
-
           <ul class="dropdown-menu">
             <!-- Cabecera usuario -->
             <li class="user-header">
-              <?php if (!empty($_SESSION["foto"])): ?>
-                <img src="<?= htmlspecialchars($_SESSION["foto"]); ?>" class="img-circle" alt="User Image">
-              <?php else: ?>
-                <img src="vistas/img/usuarios/default/anonymous.png" class="img-circle" alt="User Image">
-              <?php endif; ?>
-              <img src="<?= htmlspecialchars($fotoUsuario); ?>" class="img-circle" alt="Foto de usuario">
+              <img src="<?= htmlspecialchars($fotoUsuario, ENT_QUOTES, 'UTF-8'); ?>" class="img-circle" alt="Foto de usuario">
               <p>
-                <?= htmlspecialchars($_SESSION["nombre"]." ".$_SESSION["apellido"]); ?>
-                <small>Usuario</small>
-                <?= htmlspecialchars($nombreUsuario); ?>
-                <small><?= htmlspecialchars($perfilUsuario !== '' ? $perfilUsuario : 'Usuario'); ?></small>
+                <?= htmlspecialchars($nombreUsuario, ENT_QUOTES, 'UTF-8'); ?>
+                <small><?= htmlspecialchars($perfilUsuario !== '' ? $perfilUsuario : 'Usuario', ENT_QUOTES, 'UTF-8'); ?></small>
               </p>
             </li>
-
             <!-- Pie -->
             <li class="user-footer">
               <div class="pull-left">

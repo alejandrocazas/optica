@@ -195,3 +195,62 @@
     max-height: none;
   }
 }
+:root {
+  /* tokens de color */
+  --primary:#0072ff; --primary-2:#00c6ff;
+  --bg:#f3f6fb; --text:#0f1c2d; --muted:#6d778a;
+  --card:#fff; --border:#e6ecf5; --shadow:0 12px 28px rgba(15,40,120,.12);
+}
+
+/* fondo general + tipografía */
+body.hold-transition { background: var(--bg); color: var(--text); }
+
+/* cards modernas */
+.card-modern {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius:16px; box-shadow: var(--shadow);
+  padding:18px;
+}
+.card-modern .card-title { font-weight:700; font-size:16px; margin:0 0 12px; }
+
+/* botones */
+.btn-primary-gradient{
+  background-image: linear-gradient(135deg,var(--primary),var(--primary-2));
+  border:none; color:#fff !important; border-radius:12px;
+  box-shadow:0 10px 20px rgba(0,114,255,.25);
+}
+.btn-soft{
+  background:#eef4ff; color:#0f3d91; border:1px solid #dce6ff; border-radius:12px;
+}
+
+/* iconos en chips */
+.badge-icon{
+  display:inline-flex; align-items:center; gap:8px; padding:6px 10px;
+  background:#eef4ff; color:#0f3d91; border-radius:20px; font-weight:600;
+}
+
+/* tablas */
+.table-modern>thead>tr>th{
+  font-weight:700; color:#334155; border-bottom:2px solid var(--border);
+}
+.table-modern>tbody>tr>td { vertical-align:middle; }
+.table-actions .btn{ margin-right:6px; }
+
+/* cajas del “tablero” */
+.tile {
+  background:#fff; border:1px solid var(--border); border-radius:18px;
+  box-shadow: var(--shadow); padding:26px 18px; text-align:center;
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.tile:hover{ transform: translateY(-2px); box-shadow:0 16px 32px rgba(15,40,120,.18); }
+.tile i{ font-size:36px; color:var(--primary); display:block; margin-bottom:8px; }
+.tile span{ font-weight:700; }
+
+/* header de página */
+.content-header h1{ font-weight:800; }
+.breadcrumb { background:transparent; margin:0; }
+
+/* focus accesible */
+a:focus, button:focus, .btn:focus{
+  outline: 3px solid rgba(0,114,255,.35)!important; outline-offset: 2px;
+}

@@ -48,7 +48,7 @@ session_start();
       // ============================
       require_once 'modulos/cabezote.php';   // <header class="main-header"> (una sola vez)
       require_once 'modulos/menu.php';
-      require_once 'modulos/inicio.php';       // <aside class="main-sidebar"> (una sola vez)
+      //require_once 'modulos/inicio.php';       // <aside class="main-sidebar"> (una sola vez)
 
       // ============================
       // CONTENIDO

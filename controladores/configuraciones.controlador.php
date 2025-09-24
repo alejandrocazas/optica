@@ -76,27 +76,19 @@ class Controladorconfiguraciones{
 			
 				if($respuesta == "ok"){
 
+					
 					echo '<script>
-
-					swal({
-
-						type: "success",
-						title: "¡El configuracion ha sido guardado correctamente!",
-						showConfirmButton: true,
-						confirmButtonText: "Cerrar"
-
-					}).then(function(result){
-
-						if(result.value){
-						
-							window.location = "configuraciones";
-
-						}
-
-					});
-				
-
-					</script>';
+  window.addEventListener("load", function () {
+    swal({
+      type: "success",
+      title: "La configuración ha sido guardada correctamente",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "configuraciones"; }
+    });
+  });
+</script>';
 
 
 				}	
@@ -104,27 +96,19 @@ class Controladorconfiguraciones{
 
 			}else{
 
-				echo '<script>
-
-					swal({
-
-						type: "error",
-						title: "¡El configuracion no puede ir vacío o llevar caracteres especiales!",
-						showConfirmButton: true,
-						confirmButtonText: "Cerrar"
-
-					}).then(function(result){
-
-						if(result.value){
-						
-							window.location = "configuraciones";
-
-						}
-
-					});
 				
-
-				</script>';
+				echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "error",
+      title: "¡La configuración no puede ir vacío o llevar caracteres especiales!,
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "configuraciones"; }
+    });
+  });
+</script>';
 
 			}
 
@@ -255,44 +239,37 @@ class Controladorconfiguraciones{
 
 				if($respuesta == "ok"){
 
-					echo'<script>
-
-					swal({
-						  type: "success",
-						  title: "El configuracion ha sido editado correctamente",
-						  showConfirmButton: true,
-						  confirmButtonText: "Cerrar"
-						  }).then(function(result) {
-									if (result.value) {
-
-									window.location = "configuraciones";
-
-									}
-								})
-
-					</script>';
+					echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "success",
+      title: "La configuración ha sido editada correctamente",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "configuraciones"; }
+    });
+  });
+</script>';
 
 				}
 
 
 			}else{
 
-				echo'<script>
+				echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "error",
+      title: "¡La configuración no puede ir vacío o llevar caracteres especiales!,
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "configuraciones"; }
+    });
+  });
+</script>';
 
-					swal({
-						  type: "error",
-						  title: "¡El nombre no puede ir vacío o llevar caracteres especiales!",
-						  showConfirmButton: true,
-						  confirmButtonText: "Cerrar"
-						  }).then(function(result) {
-							if (result.value) {
-
-							window.location = "configuraciones";
-
-							}
-						})
-
-			  	</script>';
 
 			}
 
@@ -322,23 +299,18 @@ class Controladorconfiguraciones{
 
 			if($respuesta == "ok"){
 
-				echo'<script>
-
-				swal({
-					  type: "success",
-					  title: "El configuracion ha sido borrado correctamente",
-					  showConfirmButton: true,
-					  confirmButtonText: "Cerrar",
-					  closeOnConfirm: false
-					  }).then(function(result) {
-								if (result.value) {
-
-								window.location = "configuraciones";
-
-								}
-							})
-
-				</script>';
+				echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "success",
+      title: "La configuración ha sido borrada correctamente",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "configuraciones"; }
+    });
+  });
+</script>';
 
 			}		
 

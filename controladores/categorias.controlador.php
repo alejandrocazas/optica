@@ -20,44 +20,40 @@ class ControladorCategorias{
 
 				if($respuesta == "ok"){
 
-					echo'<script>
-
-					swal({
-						  type: "success",
-						  title: "La categoría ha sido guardada correctamente",
-						  showConfirmButton: true,
-						  confirmButtonText: "Cerrar"
-						  }).then(function(result){
-									if (result.value) {
-
-									window.location = "categorias";
-
-									}
-								})
-
-					</script>';
+					
+					echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "success",
+      title: "La categoría ha sido guardada correctamente",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "categorias"; }
+    });
+  });
+</script>';
+					
 
 				}
 
 
 			}else{
 
-				echo'<script>
-
-					swal({
-						  type: "error",
-						  title: "¡La categoría no puede ir vacía o llevar caracteres especiales!",
-						  showConfirmButton: true,
-						  confirmButtonText: "Cerrar"
-						  }).then(function(result){
-							if (result.value) {
-
-							window.location = "categorias";
-
-							}
-						})
-
-			  	</script>';
+				
+				echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "error",
+      title: "¡La categoría no puede ir vacía o llevar caracteres especiales!",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "categorias"; }
+    });
+  });
+</script>';
+				
 
 			}
 
@@ -98,44 +94,38 @@ class ControladorCategorias{
 
 				if($respuesta == "ok"){
 
-					echo'<script>
-
-					swal({
-						  type: "success",
-						  title: "La categoría ha sido cambiada correctamente",
-						  showConfirmButton: true,
-						  confirmButtonText: "Cerrar"
-						  }).then(function(result){
-									if (result.value) {
-
-									window.location = "categorias";
-
-									}
-								})
-
-					</script>';
+					
+					echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "success",
+      title: "La categoría ha sido cambiada correctamente",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "categorias"; }
+    });
+  });
+</script>';
 
 				}
 
 
 			}else{
 
-				echo'<script>
-
-					swal({
-						  type: "error",
-						  title: "¡La categoría no puede ir vacía o llevar caracteres especiales!",
-						  showConfirmButton: true,
-						  confirmButtonText: "Cerrar"
-						  }).then(function(result){
-							if (result.value) {
-
-							window.location = "categorias";
-
-							}
-						})
-
-			  	</script>';
+				echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "error",
+      title: "¡La categoría no puede ir vacía o llevar caracteres especiales!",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "categorias"; }
+    });
+  });
+</script>';
+			
 
 			}
 
@@ -158,22 +148,19 @@ class ControladorCategorias{
 
 			if($respuesta == "ok"){
 
-				echo'<script>
-
-					swal({
-						  type: "success",
-						  title: "La categoría ha sido borrada correctamente",
-						  showConfirmButton: true,
-						  confirmButtonText: "Cerrar"
-						  }).then(function(result){
-									if (result.value) {
-
-									window.location = "categorias";
-
-									}
-								})
-
-					</script>';
+				
+					echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "success",
+      title: "La categoría ha sido borrada correctamente",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "categorias"; }
+    });
+  });
+</script>';
 			}
 		}
 		

@@ -31,22 +31,19 @@ class ControladorVentas{
 
 			if($_POST["listaProductos"] == ""){
 
-					echo'<script>
-
-				swal({
-					  type: "error",
-					  title: "La venta no se ha ejecuta si no hay productos",
-					  showConfirmButton: true,
-					  confirmButtonText: "Cerrar"
-					  }).then(function(result){
-								if (result.value) {
-
-								window.location = "ventas";
-
-								}
-							})
-
-				</script>';
+					
+				echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "error",
+      title: "La venta no se ha ejecuta si no hay productos",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "ventas"; }
+    });
+  });
+</script>';
 
 				return;
 			}
@@ -197,24 +194,19 @@ class ControladorVentas{
 			
 
 				
-				echo'<script>
+				echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "success",
+      title: "La venta ha sido guardada correctamente",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "ventas"; }
+    });
+  });
+</script>';
 
-				localStorage.removeItem("rango");
-
-				swal({
-					  type: "success",
-					  title: "La venta ha sido guardada correctamente",
-					  showConfirmButton: true,
-					  confirmButtonText: "Cerrar"
-					  }).then(function(result){
-								if (result.value) {
-
-								window.location = "ventas";
-
-								}
-							})
-
-				</script>';
 
 			}
 
@@ -439,24 +431,19 @@ class ControladorVentas{
 
 			if($respuesta == "ok"){
 
-				echo'<script>
+				echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "success",
+      title: "La venta ha sido editada correctamente",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "ventas"; }
+    });
+  });
+</script>';
 
-				localStorage.removeItem("rango");
-
-				swal({
-					  type: "success",
-					  title: "La venta ha sido editada correctamente",
-					  showConfirmButton: true,
-					  confirmButtonText: "Cerrar"
-					  }).then((result) => {
-								if (result.value) {
-
-								window.location = "ventas";
-
-								}
-							})
-
-				</script>';
 
 			}
 
@@ -586,22 +573,19 @@ class ControladorVentas{
 
 			if($respuesta == "ok"){
 
-				echo'<script>
+				echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "success",
+      title: "La venta ha sido eliminada correctamente",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "ventas"; }
+    });
+  });
+</script>';
 
-				swal({
-					  type: "success",
-					  title: "La venta ha sido borrada correctamente",
-					  showConfirmButton: true,
-					  confirmButtonText: "Cerrar"
-					  }).then(function(result){
-								if (result.value) {
-
-								window.location = "ventas";
-
-								}
-							})
-
-				</script>';
 
 			}		
 		}

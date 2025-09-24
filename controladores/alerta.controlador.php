@@ -23,53 +23,37 @@ class ControladorAlerta {
 			
 				if($respuesta == "ok"){
 
+					
 					echo '<script>
-
-					swal({
-
-						type: "success",
-						title: "¡Espacio Oftalmológico Alertado!",
-						showConfirmButton: true,
-						confirmButtonText: "Cerrar"
-
-					}).then(function(result){
-
-						if(result.value){
-						
-							window.location = "crear-venta";
-
-						}
-
-					});
-				
-
-					</script>';
+  window.addEventListener("load", function () {
+    swal({
+      type: "success",
+      title: "¡Espacio Oftalmológico Alertado!",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "crear-venta"; }
+    });
+  });
+</script>';
 
 				}
 
 				}else{
 
-				echo '<script>
-
-					swal({
-
-						type: "error",
-						title: "¡SELECCIONA AL CLIENTE!",
-						showConfirmButton: true,
-						confirmButtonText: "Cerrar"
-
-					}).then(function(result){
-
-						if(result.value){
-						
-							window.location = "crear-venta";
-
-						}
-
-					});
 				
-
-				</script>';
+				echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "error",
+      title: "¡SELECCIONA AL CLIENTE!",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "crear-venta"; }
+    });
+  });
+</script>';
 			}
 	
 		}

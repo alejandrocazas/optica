@@ -34,6 +34,9 @@ session_start();
   <!-- Google Font -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic" />
 
+  <!-- Bootstrap-select (si lo usas) -->
+  <link rel="stylesheet" href="vistas/plugins/boosel/bootstrap-select.min.css" />
+
   <!-- Tu CSS personalizado -->
   <link rel="stylesheet" href="vistas/dist/css/custom.css" />
 </head>
@@ -48,14 +51,15 @@ session_start();
       // ============================
       require_once 'modulos/cabezote.php';   // <header class="main-header"> (una sola vez)
       require_once 'modulos/menu.php';
-      //require_once 'modulos/inicio.php';       // <aside class="main-sidebar"> (una sola vez)
+      //require_once 'modulos/inicio.php';   // <aside class="main-sidebar"> (una sola vez)
 
       // ============================
       // CONTENIDO
       // ============================
       $ruta = isset($_GET['ruta']) ? $_GET['ruta'] : 'inicio';
       $rutasPermitidas = [
-        'inicio','usuarios','categorias','productos','clientes','ventas','crear-venta','editar-venta','reportes','historias','configuraciones','proveedores','salir'
+        'inicio','usuarios','categorias','productos','clientes','ventas','crear-venta','editar-venta',
+        'reportes','historias','configuraciones','proveedores','salir'
       ];
       if (in_array($ruta, $rutasPermitidas, true)) {
         require_once 'modulos/'.$ruta.'.php';
@@ -84,13 +88,31 @@ session_start();
 <!-- AdminLTE 2.4.18 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.18/js/adminlte.min.js"></script>
 
-<!-- Plugins (solo una vez cada uno) -->
+<!-- Plugins (una sola vez cada uno) -->
 <script src="vistas/bower_components/fastclick/lib/fastclick.js"></script>
 <script src="vistas/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
 <script src="vistas/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
 <script src="vistas/bower_components/datatables.net-bs/js/dataTables.responsive.min.js"></script>
 <script src="vistas/bower_components/datatables.net-bs/js/responsive.bootstrap.min.js"></script>
+
+<!-- SweetAlert2 -->
 <script src="vistas/plugins/sweetalert2/sweetalert2.all.js"></script>
+<!-- Shim de compatibilidad para código legacy que usa `swal({...})` -->
+<script>
+  (function () {
+    // Si SweetAlert2 está disponible y no existe `swal`, creamos alias
+    if (typeof Swal !== 'undefined' && !window.swal) {
+      window.swal = function (opts) {
+        // Asegura compat con controladores que esperan result.value
+        return Swal.fire(opts).then(function (res) {
+          res.value = !!res.isConfirmed;
+          return res;
+        });
+      };
+    }
+  })();
+</script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/core-js/2.4.1/core.js"></script><!-- polyfill IE para SweetAlert2 si lo necesitas -->
 <script src="vistas/plugins/iCheck/icheck.min.js"></script>
 <script src="vistas/plugins/input-mask/jquery.inputmask.js"></script>
@@ -105,8 +127,7 @@ session_start();
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
 
-<!-- Bootstrap-select (si lo usas) -->
-<link rel="stylesheet" href="vistas/plugins/boosel/bootstrap-select.min.css" />
+<!-- Bootstrap-select -->
 <script src="vistas/plugins/boosel/bootstrap-select.min.js"></script>
 <script src="vistas/plugins/boosel/default-es_ES.min.js"></script>
 

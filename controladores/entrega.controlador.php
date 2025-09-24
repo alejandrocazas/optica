@@ -54,41 +54,34 @@ class ControladorEntrega
 
             if ($respuesta == "ok") {
 
-                echo '<script>
 
-
-					swal({
-						  type: "success",
-						  title: "El pedido ha sido entregado perfectamente",
-						  showConfirmButton: true,
-						  confirmButtonText: "Cerrar"
-						  }).then(function(result){
-									if (result.value) {
-		
-									window.location = "ventas";
-		
-									}
-								})
-		
-					</script>';
+					echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "success",
+      title: "El pedido ha sido entregado perfectamente",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "ventas"; }
+    });
+  });
+</script>';
             } else {
 
-                echo '<script>
-		
-					swal({
-						  type: "error",
-						  title: "¡El pedido no podrá ser entregado!",
-						  showConfirmButton: true,
-						  confirmButtonText: "Cerrar"
-						  }).then(function(result){
-							if (result.value) {
-		
-							window.location = "ventas";
-		
-							}
-						})
-		
-				  </script>';
+                
+				  echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "error",
+      title: "¡El pedido no podrá ser entregado!",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "ventas"; }
+    });
+  });
+</script>';
             }
         }
     }

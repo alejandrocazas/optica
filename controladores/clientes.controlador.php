@@ -26,43 +26,36 @@ class ControladorClientes{
 
 			   	if($respuesta == "ok"){
 
-					echo'<script>
-
-					swal({
-						  type: "success",
-						  title: "El cliente ha sido guardado correctamente",
-						  showConfirmButton: true,
-						  confirmButtonText: "Cerrar"
-						  }).then(function(result){
-									if (result.value) {
-
-									window.location = "crear-venta";
-
-									}
-								})
-
-					</script>';
+					echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "success",
+      title: "El cliente ha sido creado correctamente",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "clientes"; }
+    });
+  });
+</script>';
 
 				}
 
 			}else{
 
-				echo'<script>
-
-					swal({
-						  type: "error",
-						  title: "¡El cliente no puede ir vacío o llevar caracteres especiales!",
-						  showConfirmButton: true,
-						  confirmButtonText: "Cerrar"
-						  }).then(function(result){
-							if (result.value) {
-
-							window.location = "clientes";
-
-							}
-						})
-
-			  	</script>';
+				
+				echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "error",
+      title: "¡El cliente no puede ir vacío o llevar caracteres especiales!,
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "clientes"; }
+    });
+  });
+</script>';
 
 
 
@@ -110,43 +103,35 @@ class ControladorClientes{
 
 			   	if($respuesta == "ok"){
 
-					echo'<script>
-
-					swal({
-						  type: "success",
-						  title: "El cliente ha sido cambiado correctamente",
-						  showConfirmButton: true,
-						  confirmButtonText: "Cerrar"
-						  }).then(function(result){
-									if (result.value) {
-
-									window.location = "clientes";
-
-									}
-								})
-
-					</script>';
+					echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "success",
+      title: "El cliente ha sido editado correctamente",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "clientes"; }
+    });
+  });
+</script>';
 
 				}
 
 			}else{
 
-				echo'<script>
-
-					swal({
-						  type: "error",
-						  title: "¡El cliente no puede ir vacío o llevar caracteres especiales!",
-						  showConfirmButton: true,
-						  confirmButtonText: "Cerrar"
-						  }).then(function(result){
-							if (result.value) {
-
-							window.location = "clientes";
-
-							}
-						})
-
-			  	</script>';
+				echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "error",
+      title: "¡El cliente no puede ir vacío o llevar caracteres especiales!,
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "clientes"; }
+    });
+  });
+</script>';
 
 
 
@@ -171,23 +156,19 @@ class ControladorClientes{
 
 			if($respuesta == "ok"){
 
-				echo'<script>
-
-				swal({
-					  type: "success",
-					  title: "El cliente ha sido borrado correctamente",
-					  showConfirmButton: true,
-					  confirmButtonText: "Cerrar",
-					  closeOnConfirm: false
-					  }).then(function(result){
-								if (result.value) {
-
-								window.location = "clientes";
-
-								}
-							})
-
-				</script>';
+				
+				echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "success",
+      title: "El cliente ha sido borrado correctamente",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "clientes"; }
+    });
+  });
+</script>';
 
 			}		
 

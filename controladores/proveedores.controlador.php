@@ -33,43 +33,36 @@ class Controladorproveedores{
 
 			   	if($respuesta == "ok"){
 
-					echo'<script>
-
-					swal({
-						  type: "success",
-						  title: "El proveedor ha sido guardado correctamente",
-						  showConfirmButton: true,
-						  confirmButtonText: "Cerrar"
-						  }).then(function(result){
-									if (result.value) {
-
-									window.location = "proveedores";
-
-									}
-								})
-
-					</script>';
+					
+					echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "success",
+      title: "El proveedor ha sido guardado correctamente",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "proveedores"; }
+    });
+  });
+</script>';
 
 				}
 
 			}else{
 
-				echo'<script>
-
-					swal({
-						  type: "error",
-						  title: "¡El proveedor no puede ir vacío o llevar caracteres especiales!",
-						  showConfirmButton: true,
-						  confirmButtonText: "Cerrar"
-						  }).then(function(result){
-							if (result.value) {
-
-							window.location = "proveedores";
-
-							}
-						})
-
-			  	</script>';
+				echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "error",
+      title: "¡El proveedor no puede ir vacío o llevar caracteres especiales!,
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "proveedores"; }
+    });
+  });
+</script>';
 
 
 
@@ -130,43 +123,36 @@ class Controladorproveedores{
 
 			   	if($respuesta == "ok"){
 
-					echo'<script>
-
-					swal({
-						  type: "success",
-						  title: "El proveedor ha sido cambiado correctamente",
-						  showConfirmButton: true,
-						  confirmButtonText: "Cerrar"
-						  }).then(function(result){
-									if (result.value) {
-
-									window.location = "proveedores";
-
-									}
-								})
-
-					</script>';
+					echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "success",
+      title: "El proveedor ha sido editado correctamente",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "proveedores"; }
+    });
+  });
+</script>';
+					
 
 				}
 
 			}else{
 
-				echo'<script>
-
-					swal({
-						  type: "error",
-						  title: "¡El proveedor no puede ir vacío o llevar caracteres especiales!",
-						  showConfirmButton: true,
-						  confirmButtonText: "Cerrar"
-						  }).then(function(result){
-							if (result.value) {
-
-							window.location = "proveedores";
-
-							}
-						})
-
-			  	</script>';
+				echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "error",
+      title: "¡El proveedor no puede ir vacío o llevar caracteres especiales!,
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "proveedores"; }
+    });
+  });
+</script>';
 
 
 
@@ -191,24 +177,18 @@ class Controladorproveedores{
 
 			if($respuesta == "ok"){
 
-				echo'<script>
-
-				swal({
-					  type: "success",
-					  title: "El proveedor ha sido borrado correctamente",
-					  showConfirmButton: true,
-					  confirmButtonText: "Cerrar",
-					  closeOnConfirm: false
-					  }).then(function(result){
-								if (result.value) {
-
-								window.location = "proveedores";
-
-								}
-							})
-
-				</script>';
-
+				echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "success",
+      title: "El proveedor ha sido borrado correctamente",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "proveedores"; }
+    });
+  });
+</script>';
 			}		
 
 		}

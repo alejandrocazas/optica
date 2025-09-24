@@ -152,27 +152,18 @@ class ControladorUsuarios{
 			
 				if($respuesta == "ok"){
 
-					echo '<script>
-
-					swal({
-
-						type: "success",
-						title: "¡El usuario ha sido guardado correctamente!",
-						showConfirmButton: true,
-						confirmButtonText: "Cerrar"
-
-					}).then(function(result){
-
-						if(result.value){
-						
-							window.location = "usuarios";
-
-						}
-
-					});
-				
-
-					</script>';
+				echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "success",
+      title: "El usuario ha sido creado correctamente",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "usuarios"; }
+    });
+  });
+</script>';
 
 
 				}	
@@ -181,26 +172,17 @@ class ControladorUsuarios{
 			}else{
 
 				echo '<script>
-
-					swal({
-
-						type: "error",
-						title: "¡El usuario no puede ir vacío o llevar caracteres especiales!",
-						showConfirmButton: true,
-						confirmButtonText: "Cerrar"
-
-					}).then(function(result){
-
-						if(result.value){
-						
-							window.location = "usuarios";
-
-						}
-
-					});
-				
-
-				</script>';
+  window.addEventListener("load", function () {
+    swal({
+      type: "error",
+      title: "¡El usuario no puede ir vacío o llevar caracteres especiales!,
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "usuarios"; }
+    });
+  });
+</script>';
 
 			}
 
@@ -322,22 +304,18 @@ class ControladorUsuarios{
 
 					}else{
 
-						echo'<script>
-
-								swal({
-									  type: "error",
-									  title: "¡La contraseña no puede ir vacía o llevar caracteres especiales!",
-									  showConfirmButton: true,
-									  confirmButtonText: "Cerrar"
-									  }).then(function(result) {
-										if (result.value) {
-
-										window.location = "usuarios";
-
-										}
-									})
-
-						  	</script>';
+						echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "error",
+      title: "¡La contraseña no puede ir vacía o llevar caracteres especiales!",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "usuarios"; }
+    });
+  });
+</script>';
 
 						  	return;
 
@@ -360,44 +338,36 @@ class ControladorUsuarios{
 
 				if($respuesta == "ok"){
 
-					echo'<script>
-
-					swal({
-						  type: "success",
-						  title: "El usuario ha sido editado correctamente",
-						  showConfirmButton: true,
-						  confirmButtonText: "Cerrar"
-						  }).then(function(result) {
-									if (result.value) {
-
-									window.location = "usuarios";
-
-									}
-								})
-
-					</script>';
+					echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "success",
+      title: "El usuario ha sido editado correctamente",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "usuarios"; }
+    });
+  });
+</script>';
 
 				}
 
 
 			}else{
 
-				echo'<script>
-
-					swal({
-						  type: "error",
-						  title: "¡El nombre no puede ir vacío o llevar caracteres especiales!",
-						  showConfirmButton: true,
-						  confirmButtonText: "Cerrar"
-						  }).then(function(result) {
-							if (result.value) {
-
-							window.location = "usuarios";
-
-							}
-						})
-
-			  	</script>';
+				echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "error",
+      title: "¡El usuario no puede ir vacío o llevar caracteres especiales!,
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "usuarios"; }
+    });
+  });
+</script>';
 
 			}
 
@@ -427,23 +397,18 @@ class ControladorUsuarios{
 
 			if($respuesta == "ok"){
 
-				echo'<script>
-
-				swal({
-					  type: "success",
-					  title: "El usuario ha sido borrado correctamente",
-					  showConfirmButton: true,
-					  confirmButtonText: "Cerrar",
-					  closeOnConfirm: false
-					  }).then(function(result) {
-								if (result.value) {
-
-								window.location = "usuarios";
-
-								}
-							})
-
-				</script>';
+				echo '<script>
+  window.addEventListener("load", function () {
+    swal({
+      type: "success",
+      title: "El usuario ha sido eliminado correctamente",
+      showConfirmButton: true,
+      confirmButtonText: "Cerrar"
+    }).then(function(result){
+      if (result.value) { window.location = "usuarios"; }
+    });
+  });
+</script>';
 
 			}		
 

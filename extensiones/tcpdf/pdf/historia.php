@@ -1,5 +1,5 @@
 <?php
-
+// ===== Dependencias de tu MVC =====
 require_once "../../../controladores/ventas.controlador.php";
 require_once "../../../modelos/ventas.modelo.php";
 
@@ -12,727 +12,316 @@ require_once "../../../modelos/usuarios.modelo.php";
 require_once "../../../controladores/productos.controlador.php";
 require_once "../../../modelos/productos.modelo.php";
 
-
 require_once "../../../controladores/historias.controlador.php";
 require_once "../../../modelos/historias.modelo.php";
 
 require_once "../../../controladores/configuraciones.controlador.php";
 require_once "../../../modelos/configuraciones.modelo.php";
 
-class imprimirhistoria {
+// ===== Evitar que NOTICES arruinen el PDF =====
+error_reporting(E_ERROR | E_PARSE);
+ini_set('display_errors', 0);
 
-public $codigo;
+// ===== Utilidades =====
+function e($s){ return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); }
+function toTitle($s){ return mb_convert_case(trim((string)$s), MB_CASE_UPPER, 'UTF-8'); }
+function onlyDigits($s){ return preg_replace('/[^\d\-+\.]/', '', (string)$s); }
+function ageFrom($ymd){
+  if (!$ymd) return '';
+  $b = DateTime::createFromFormat('Y-m-d', substr($ymd,0,10));
+  if (!$b) return '';
+  $t = new DateTime('today');
+  return $b->diff($t)->y;
+}
 
-public function traerImpresionhistoria(){
+// ====== Parámetro ======
+$codigo = isset($_GET["codigo"]) ? $_GET["codigo"] : null;
+date_default_timezone_set('America/La_Paz');
+$hoyStr = date('d/m/Y');
 
-//TRAEMOS LA INFORMACIÓN DE LA VENTA
+// ====== Configuración del local ======
+$nombret = $mercantil = $direcciont = $direcciont2 = $telefonot = $emailt = $fotot = '';
+$configs = Controladorconfiguraciones::ctrMostrarconfiguraciones(null, null);
+if (is_array($configs) && count($configs)) {
+  $c = $configs[0];
+  $nombret    = $c["nombre"] ?? '';
+  $mercantil  = $c["configuracion"] ?? '';
+  $direcciont = $c["direccion"] ?? '';
+  $direcciont2= $c["direccion2"] ?? '';
+  $telefonot  = $c["telefono"] ?? '';
+  $emailt     = strtolower($c["email"] ?? '');
+  $fotot      = !empty($c["foto"]) ? $c["foto"] : 'vistas/img/configuraciones/default/anonymous.png';
+}
 
-$itemhistoria = "codigo";
-$valorhistoria = $this->codigo;
+// ====== Buscar historia por id (codigo) ======
+$h = null;
+$historias = Controladorhistorias::ctrMostrarhistorias(null, null);
+if (is_array($historias)) {
+  foreach ($historias as $row) {
+    if ((string)$row['id'] === (string)$codigo) { $h = $row; break; }
+  }
+}
+if (!$h) { die("No se encontró la historia."); }
 
+// ====== Datos historia / paciente ======
+$idHistoria  = $h['id'];
+$pacNombre   = toTitle(($h['nombre'] ?? '') . ' ' . ($h['apellido'] ?? ''));
+$ci          = e($h['documentoid'] ?? '');
 
-//fecha
-date_default_timezone_set('America/Bogota');
+$fnacRaw     = substr((string)($h['edad'] ?? ''), 0, 10);
+$fnacPrint   = $fnacRaw ?: '';
+$edadYears   = ageFrom($fnacRaw);
+$edadPrint   = $edadYears !== '' ? $edadYears.' años' : '';
 
-$fecha = date('d-m-Y');
+// Diagnóstico / Observaciones
+$diag        = e($h['diagnostico'] ?? '');
+$observ      = e($h['observaciones'] ?? '');
 
+// Refracción LEJOS
+$esferaODL   = e($h['esferaodlj'] ?? '');
+$cilindroODL = e($h['cilindroodlj'] ?? '');
+$ejeODL      = e($h['ejeodlj'] ?? '');
 
-$item4 = null;
-          $valor4 = null;
+$esferaOIL   = e($h['esferaoilj'] ?? '');
+$cilindroOIL = e($h['cilindrooilj'] ?? '');
+$ejeOIL      = e($h['ejeoilj'] ?? '');
 
-          $nombret = null;
-          $mercantil = null;
-          $direcciont = null;
-          $direcciont2 = null;
-          $telefonot = null;
-          $emailt = null;
-          $fotot = null;
+// Refracción CERCA
+$esferaODC   = e($h['esferaodcc'] ?? '');
+$cilindroODC = e($h['cilindroodcc'] ?? '');
+$ejeODC      = e($h['ejeodcc'] ?? '');
 
+$esferaOIC   = e($h['esferaoicc'] ?? '');
+$cilindroOIC = e($h['cilindrooicc'] ?? '');
+$ejeOIC      = e($h['ejeoicc'] ?? '');
 
-     $configuraciones = Controladorconfiguraciones::ctrMostrarconfiguraciones($item4, $valor4);
+// ADD / DP
+$add         = e($h['adicion'] ?? '0');
+$dp          = e($h['dp'] ?? '');
 
-          foreach ($configuraciones as $key => $value2) {
-
-          $nombret = $value2["nombre"];
-          $mercantil = $value2["configuracion"];
-          $direcciont = $value2["direccion"];
-          $direcciont2 = $value2["direccion2"];
-          $telefonot = $value2["telefono"];
-          $emailt = $value2["email"];
-          
-          if($value2["foto"] != ""){
-
-                    $fotot = $value2["foto"];
-
-                  }else{
-
-                    $fotot = 'vistas/img/configuraciones/default/anonymous.png';
-
-                  }
-
-          }
-
-
-
-
-
-//TRAEMOS LA INFORMACIÓN DE la historia
-
-          $item1 = null;
-          $valor1 = null;
-
-          //datos cliente
-          $auxid = null;
-          $auxnombre1er = null;
-          $auxnombre2do = null;
-          $auxapellido1er = null;
-          $auxapellido2do = null;
-          $auxdocumentoid = null;
-          $auxdireccion = null;
-          $auxtelefono = null;
-
-          //ojo derecho
-          $auxesferaod = null;
-          $auxcilindrood = null;
-          $auxejeod= null;
-     
-           //ojo izq
-          $auxesferaoi = null;
-          $auxcilindrooi = null;
-          $auxejeoi= null;
-
-          //nota
-          $auxnotaoi = null;
-          $auxnotaod = null;
-          $auxobservaciones = null;
-      
-   
-
-          $historias = Controladorhistorias::ctrMostrarhistorias($item1, $valor1);
-
-          foreach ($historias as $key => $value2) {
-
-               if ($value2["id"] == $valorhistoria) {
-
-
-          //datos cliente
-          $id = $value2["id"];
-          $auxnombre1er = $value2["nombre"];
-          $auxapellido1er = $value2["apellido"];
-          $auxdocumentoid = $value2["documentoid"];
-          $auxdireccion = $value2["direccion"];
-          $auxtelefono = $value2["telefono"];
-          $auxedad = $value2["edad"];
-         
-          //atencion
-
-          $anamnesis = $value2["anamnesis"];
-          $antecedentes = $value2["antecedentes"];
-
-          //av
-
-          $odsc = $value2["odsc"];
-          $odcc = $value2["odcc"];
-          $oisc = $value2["oisc"];
-          $oicc = $value2["oicc"];
-          $cc = $value2["cc"];
-
-          //refraccion lejos
-
-          //ojo der
-          $esferalj_OD = $value2["esferaodlj"];
-          $cilindrolj_OD = $value2["cilindroodlj"];
-          $ejelj_OD = $value2["ejeodlj"];
-
-          //ojo iz
-          $esferalj_OI = $value2["esferaoilj"];
-          $cilindrolj_OI = $value2["cilindrooilj"];
-          $ejelj_OI = $value2["ejeoilj"];
-
-          //refraccion CERCA
-
-          //ojo der
-          $esferacc_OD = $value2["esferaodcc"];
-          $cilindrocc_OD = $value2["cilindroodcc"];
-          $ejecc_OD = $value2["ejeodcc"];
-
-          //ojo iz
-          $esferacc_OI = $value2["esferaoicc"];
-          $cilindrocc_OI = $value2["cilindrooicc"];
-          $ejecc_OI = $value2["ejeoicc"];
-
-          //Distancia Interpupilar
-
-          $add = $value2["adicion"];
-          $dp = $value2["dp"];
-
-          //diagnostico
-
-          $patologia = $value2["diagnostico"];
-
-          //tonometria
-
-          $ODmmHg = $value2["tonood"];
-          $OImmHg = $value2["tonooi"];
-          $tonohora = $value2["tonohora"];
-
-          //observacion
-
-          $auxobservaciones = $value2["observaciones"];
-               }     
-          
-          }
-
-
-
-//REQUERIMOS LA CLASE TCPDF
-
+// ====== TCPDF ======
 require_once('tcpdf_include.php');
 
-$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-
+$pdf = new TCPDF('P', PDF_UNIT, 'A4', true, 'UTF-8', false);
 $pdf->setPrintHeader(false);
-
-$pdf->startPageGroup();
-
+$pdf->setPrintFooter(false);
+$pdf->SetMargins(12, 14, 12);
+$pdf->SetAutoPageBreak(true, 18);
 $pdf->AddPage();
-
-// ---------------------------------------------------------
-
-
-
-$bloque1 = <<<EOF
-
-	<table style="font-size:10px; padding:5px 10px;">
-
-		<tr>
-				
-		<td style="background-color:#B5B2B2; width:540px; text-align:center"><b>RECETA DIGITAL OFTALMOLÓGICA N° $id </b></td>  
-
-		</tr>
-
-	</table>
-
-
-     <table>
-          
-          <tr>
-			   
-			   <td style="background-color: #B5B2B2;  width:100px">
-   
-			   <img style= "padding:5px" src="../../../$fotot" width="100px" height="60">   
-   
-			   </td>
-   
-			   <td style="border: 1px solid white; background-color: #5dafc1; width:440px; text-align:right">
-			   
-			   <div style="font-size:9px; text-align:left;"> 
-
-			   <b>CENTRO OFTALMOLÓGICO:</b> $nombret
-			   <br>
-			   <b> NIT:</b> $mercantil
-			   <br>
-			   <b>DIRECCIÓN 1:</b> $direcciont
-			   <br>
-			   <b>DIRECCIÓN 2:</b> $direcciont2
-			   <br> 
-			   <b>TEL:</b> $telefonot
-			   <br>
-			   <b>CORREO:</b>$emailt
-			   <br>
-
-		       </div>
-   
-			   </td>
-
-               <td style="background-color:white; width:120px; text-align:right; color:red"> </td>
-             
-
-          </tr>
-
-     </table>
-
-EOF;
-
-$pdf->writeHTML($bloque1, false, false, false, false, '');
-
-// ---------------------------------------------------------
-
-
-
-$bloque2 = <<<EOF
-
-
-
-	<table style="font-size:10px; padding:5px 10px;">
-
-		<tr>
-				
-		<td style="background-color:#B5B2B2; width:540px; text-align:center"><b>DATOS DEL PACIENTE</b></td>  
-
-		</tr>
-	
-		<tr>
-		
-			<td style="border: 1px solid white; background-color: #5dafc1; width:270px">
-
-				<b>Cliente:</b> $auxnombre1er $auxapellido1er 
-
-			</td>
-
-               <td style="border: 1px solid white; background-color: #5dafc1; width:270px">
-
-				<b>CI:</b> $auxdocumentoid
-
-			</td>
-
-		</tr>
-
-		<tr>
-		
-			<td style="border: 1px solid white; background-color: #5dafc1; width:270px">
-
-				<b>Dirección:</b> $auxdireccion
-
-			</td>
-
-               <td style="border: 1px solid white; background-color: #5dafc1; width:270px">
-
-				<b>Telefóno:</b> $auxtelefono
-
-			</td>
-
-		</tr>
-
-		<tr>
-
-               <td style="border: 1px solid white; background-color: #5dafc1; width:270px">
-
-                    <b>Fecha de Nacimiento:</b> $auxedad
-
-               </td>
-
-               <td style="border: 1px solid white; background-color: #5dafc1; width:270px">
-
-               
-
-               </td>
-		
-
-		</tr>
-
-          <tr>
-		
-		<td style="background-color: white; width:540px"></td>
-
-		</tr>
-
-
-	</table>
-
-
-
-
-
-
-
-
-
-EOF;
-
-$pdf->writeHTML($bloque2, false, false, false, false, '');
-
-
-
-
-// ---------------------------------------------------------
-
-
-$bloque10 = <<<EOF
-
-     <table style="font-size:10px; padding:5px 10px;">
-
-          <tr>
-          
-          <td style="border: 1px solid #666; background-color:grey; width:200px; text-align:center"><b>AGUDEZA VISUAL</b></td>    
-
-          </tr>
-
-
-          <tr>
-          
-          <td style="border: 1px solid #666; background-color:white; width:100px; text-align:left">
-          
-          PL <br><br>
-          <b>ODsc:</b> $odsc <br>
-          <b>ODcc:</b> $odcc <br>
-          <b>OIsc:</b> $oisc <br>
-          <b>OIcc:</b> $oicc 
-
-          </td>   
-          
-          
-          <td style="border: 1px solid #666; background-color:white; width:100x; text-align:left">
-          
-          PC <br><br>
-          <b>Cc:</b> $cc 
-
-          </td>   
-
-          </tr>
-
-     </table>
-     
-
-
-EOF;
-
-$pdf->writeHTML($bloque10, false, false, false, false, '');
-
-// ---------------------------------------------------------
-
-
-$bloque11 = <<<EOF
-
-
-
-         <table style="font-size:12px; padding:2px 5px;">
-
-     <tr>
-          
-               <td style="  width:500px">
-
-          
-               </td>
-
-         
-
-          </tr>
-
-         
-
-        
-
-     </table>
-
-
-
-EOF;
-
-$pdf->writeHTML($bloque11, false, false, false, false, '');
-
-//-------------------------------------------------------------
-
-$bloque14 = <<<EOF
-
-
-
-     <table style="font-size:10px; padding:5px 10px;">
-
-          <tr>
-          
-          <td style="border: 1px solid #666; background-color:grey; width:100px; text-align:center"><b>ANAMNESIS</b></td>    
-
-          <td style="border: 1px solid #666; background-color:white; width:320px; text-align:left">
-          $anamnesis
-          
-          </td>    
-
-          </tr>
-
-          <tr>
-          
-          <td style="border: 1px solid #666; background-color:grey; width:100px; text-align:center"><b>ANTECEDENT.</b></td>    
-
-          <td style="border: 1px solid #666; background-color:white; width:320px; text-align:left">
-          $antecedentes
-          
-          </td>    
-
-          </tr>
-
-
-</table>
-
-
-EOF;
-
-$pdf->writeHTML($bloque14, false, false, false, false, '');
-
-
-// ---------------------------------------------------------
-
-$bloque11 = <<<EOF
-
-
-
-         <table style="font-size:12px; padding:5px 10px;">
-
-     <tr>
-          
-               <td style="  width:500px">
-
-          
-               </td>
-
-         
-
-          </tr>
-
-         
-
-        
-
-     </table>
-
-
-
-EOF;
-
-$pdf->writeHTML($bloque11, false, false, false, false, '');
-
-//-------------------------------------------------------------
-
-
-
-$bloque3 = <<<EOF
-
-     <table style="font-size:10px; padding:5px 10px;">
-
-          <tr>
-          
-          <td style="border: 1px solid #666; background-color:grey; width:60px; text-align:center"><b>LEJOS</b></td>
-          <td style="border: 1px solid #666; background-color:white; width:80px; text-align:center"><b>ESFERA</b></td>
-          <td style="border: 1px solid #666; background-color:white; width:80px; text-align:center"><b>CILINDRO</b></td>
-          <td style="border: 1px solid #666; background-color:white; width:80px; text-align:center"><b>EJE</b></td>
-                
-          </tr>
-
-          <tr>
-          
-          <td style="border: 1px solid #666; background-color:white; width:60px; text-align:center"><b>DER.</b></td>
-          <td style="border: 1px solid #666; background-color:white; width:80px; text-align:center"><b>$esferalj_OD</b></td>
-          <td style="border: 1px solid #666; background-color:white; width:80px; text-align:center"><b>$cilindrolj_OD</b></td>
-          <td style="border: 1px solid #666; background-color:white; width:80px; text-align:center"><b>$ejelj_OD</b></td>
-
-          </tr>
-
-          <tr>
-          
-          <td style="border: 1px solid #666; background-color:white; width:60px; text-align:center"><b>IZQ.</b></td>
-          <td style="border: 1px solid #666; background-color:white; width:80px; text-align:center"><b>$esferalj_OI</b></td>
-          <td style="border: 1px solid #666; background-color:white; width:80px; text-align:center"><b>$cilindrolj_OI</b></td>
-          <td style="border: 1px solid #666; background-color:white; width:80px; text-align:center"><b>$ejelj_OI</b></td>     
-
-          </tr>
-
-          <tr>
-          
-          <td style="border: 1px solid #666; background-color:grey; width:60px; text-align:center"><b>CERCA</b></td>
-          <td style="border: 1px solid #666; background-color:white; width:80px; text-align:center"><b>ESFERA</b></td>
-          <td style="border: 1px solid #666; background-color:white; width:80px; text-align:center"><b>CILINDRO</b></td>
-          <td style="border: 1px solid #666; background-color:white; width:80px; text-align:center"><b>EJE</b></td>
-                
-          </tr>
-
-          <tr>
-          
-          <td style="border: 1px solid #666; background-color:white; width:60px; text-align:center"><b>DER.</b></td>
-          <td style="border: 1px solid #666; background-color:white; width:80px; text-align:center"><b>$esferacc_OD</b></td>
-          <td style="border: 1px solid #666; background-color:white; width:80px; text-align:center"><b>$cilindrocc_OD</b></td>
-          <td style="border: 1px solid #666; background-color:white; width:80px; text-align:center"><b>$ejecc_OD</b></td>
-              
-          </tr>
-
-          <tr>
-          
-          <td style="border: 1px solid #666; background-color:white; width:60px; text-align:center"><b>IZQ.</b></td>
-          <td style="border: 1px solid #666; background-color:white; width:80px; text-align:center"><b>$esferacc_OI</b></td>
-          <td style="border: 1px solid #666; background-color:white; width:80px; text-align:center"><b>$cilindrocc_OI</b></td>
-          <td style="border: 1px solid #666; background-color:white; width:80px; text-align:center"><b>$ejecc_OI</b></td>      
-
-          </tr>
-
-
-     </table>
-
-
-EOF;
-
-$pdf->writeHTML($bloque3, false, false, false, false, '');
-
-// ---------------------------------------------------------
-
-$bloque4 = <<<EOF
-
-
-
-     <table style="font-size:12px; padding:5px 10px;">
-
-     <tr>
-          
-               <td style="  width:500px">
-
-          
-               </td>
-
-         
-
-          </tr>
-
-         
-
-        
-
-     </table>
-
-
-EOF;
-
-$pdf->writeHTML($bloque4, false, false, false, false, '');
-
-
-// ---------------------------------------------------------
-
-
-
-$bloque7 = <<<EOF
-
-     <table style="font-size:10px; padding:5px 10px;">
-
-
-
-
-     </table>
-
-
-EOF;
-
-$pdf->writeHTML($bloque7, false, false, false, false, '');
-
-// ---------------------------------------------------------
-
-
-$bloque12 = <<<EOF
-
-
-
-     <table style="font-size:10px; padding:5px 10px;">
-
-          <tr>
-          
-          <td style="border: 1px solid #666; background-color:grey; width:100px; text-align:center"><b>ADD | DP</b></td>    
-
-          <td style="border: 1px solid #666; background-color:white; width:320px; text-align:left">
-          <b>ADD:</b> $add | <b>DP:</b> $dp
-          
-          </td>    
-
-          </tr>
-
-          <tr>
-          
-          <td style="border: 1px solid #666; background-color:grey; width:100px; text-align:center"><b>DIAGNÓSTICO</b></td>    
-
-          <td style="border: 1px solid #666; background-color:white; width:320px; text-align:left">
-          $patologia
-          
-          </td>    
-
-          </tr>
-
-
-</table>
-
-
-EOF;
-
-$pdf->writeHTML($bloque12, false, false, false, false, '');
-
-
-// ---------------------------------------------------------
-
-
-$bloque13 = <<<EOF
-
-
-
-     <table style="font-size:10px; padding:5px 10px;">
-
-          <tr>
-          
-          <td style="border: 1px solid #666; background-color:grey; width:100px; text-align:center"><b> TONOMETRÍA</b></td>    
-
-          <td style="border: 1px solid #666; background-color:white; width:320px; text-align:left">
-          <b>ODmmHg:</b> $ODmmHg | <b>OImmHg:</b> $OImmHg | <b>Tiempo exacto:</b> $tonohora
-          
-          </td>    
-
-          </tr>
-
-
-     </table>
-
-
-EOF;
-
-$pdf->writeHTML($bloque13, false, false, false, false, '');
-
-
-
-// ---------------------------------------------------------
-
-
-
-$bloque8 = <<<EOF
-
-
-
-<br><br>
-     <table style="font-size:10px; padding:5px 10px;">
-
-          <tr>
-          
-          <td style="border: 1px solid #666; background-color:white; width:520px; text-align:center"><b>OBSERVACIÓN PROFESIONAL DIGITALIZADA Y CERTIFICADA</b></td>  
-
-
-
-          </tr>
-
-          <tr>
-          
-          <td style="border: 1px solid #666; background-color:white; width:520px; text-align:left">
-          
-          <b>OBS. GENERAL:</b> $auxobservaciones<br>
-     
-          
-          
-          </td>
-
-          </tr>
-
-
-     </table>
-
-
-EOF;
-
-$pdf->writeHTML($bloque8, false, false, false, false, '');
-
-
-// ---------------------------------------------------------
-
-//SALIDA DEL ARCHIVO 
-
-//$pdf->Output('factura.pdf', 'D');
-$pdf->Output('historia.pdf');
-
-}
-
-}
-
-$factura = new imprimirhistoria();
-$factura -> codigo = $_GET["codigo"];
-$factura -> traerImpresionhistoria();
-
-?>
+$pdf->SetFont('helvetica', '', 10);
+
+// ====== Encabezado (logo + datos local + tel/email/fecha) ======
+$logoPath = "../../../" . ltrim($fotot, '/');
+$logoHtml = '
+<table width="100%" cellspacing="0" cellpadding="0" style="margin-bottom:6px;">
+  <tbody>
+    <tr>
+      <td width="22%" style="vertical-align:top;">
+        <table cellspacing="0" cellpadding="6" style="border:1px solid #2f80ed;background:#e8f1ff;">
+          <tbody>
+            <tr><td align="center"><img src="'.e($logoPath).'" width="105"></td></tr>
+          </tbody>
+        </table>
+      </td>
+      <td width="48%" style="vertical-align:top;padding-left:8px;">
+        <span style="font-weight:bold;">'.e(toTitle($nombret)).'</span><br>
+        <span style="font-size:9px;">NIT: '.e($mercantil).'</span><br>
+        <span style="font-size:9px;">'.e($direcciont).'</span><br>
+        <span style="font-size:9px;">'.e($direcciont2).'</span>
+      </td>
+      <td width="30%" style="vertical-align:top;text-align:right;">
+        <span style="font-size:9px;">Tel: '.e($telefonot).'</span><br>
+        <span style="font-size:9px;">Email: '.e($emailt).'</span><br>
+        <span style="font-size:9px;">Fecha: '.e($hoyStr).'</span>
+      </td>
+    </tr>
+  </tbody>
+</table>';
+$pdf->writeHTML($logoHtml, false, false, true, false, '');
+
+// ====== Título receta ======
+$pdf->SetFont('helvetica', 'B', 11);
+$pdf->writeHTML('<div style="text-align:center;margin:2px 0 8px 0;">RECETA OFTALMOLÓGICA N° '.e($idHistoria).'</div>', false, false, true, false, '');
+$pdf->SetFont('helvetica', '', 10);
+
+// ====== Datos Paciente (sin dirección ni teléfono) ======
+$pacHtml =
+'<table width="100%" cellspacing="0" cellpadding="6" style="border:1px solid #d1d5db;border-radius:4px;margin-bottom:8px;background:#f8fafc;">
+  <tbody>
+    <tr>
+      <td width="50%">
+        <span style="font-size:9px;color:#6b7280">Paciente</span><br>
+        <span style="font-weight:bold">'.e($pacNombre).'</span><br>
+        <span style="font-size:9px;color:#6b7280">CI/NIT</span><br>
+        <span>'.e($ci).'</span>
+      </td>
+      <td width="50%" style="text-align:right;vertical-align:top;">
+        <span style="font-size:9px;color:#6b7280">F. Nacimiento / Edad</span><br>
+        <span>'.e($fnacPrint).'   '.e($edadPrint).'</span>
+      </td>
+    </tr>
+  </tbody>
+</table>';
+$pdf->writeHTML($pacHtml, false, false, true, false, '');
+
+// ====== Refracción: estilos (azules suaves) ======
+$tblHeadStyle = 'background:#eaf4ff;border:1px solid #60a5fa;font-weight:bold;text-align:center';
+$cellStyle    = 'border:1px solid #cbd5e1;text-align:center';
+
+// ====== Refracción LEJOS y CERCA (dos columnas) ======
+$refracHtml =
+'<table width="100%" cellspacing="0" cellpadding="0" style="margin-bottom:10px;">
+  <tbody>
+    <tr>
+      <td width="49%" style="vertical-align:top;">
+        <table width="100%" cellspacing="0" cellpadding="5">
+          <tbody>
+            <tr>
+              <td colspan="4" style="'.$tblHeadStyle.'">REFRACCIÓN LEJOS</td>
+            </tr>
+            <tr>
+              <td style="'.$tblHeadStyle.';width:16%;">Ojo</td>
+              <td style="'.$tblHeadStyle.';width:28%;">Esfera</td>
+              <td style="'.$tblHeadStyle.';width:28%;">Cilindro</td>
+              <td style="'.$tblHeadStyle.';width:28%;">Eje</td>
+            </tr>
+            <tr>
+              <td style="'.$cellStyle.'">OD</td>
+              <td style="'.$cellStyle.'">'.e($esferaODL).'</td>
+              <td style="'.$cellStyle.'">'.e($cilindroODL).'</td>
+              <td style="'.$cellStyle.'">'.e($ejeODL).'</td>
+            </tr>
+            <tr>
+              <td style="'.$cellStyle.'">OI</td>
+              <td style="'.$cellStyle.'">'.e($esferaOIL).'</td>
+              <td style="'.$cellStyle.'">'.e($cilindroOIL).'</td>
+              <td style="'.$cellStyle.'">'.e($ejeOIL).'</td>
+            </tr>
+            <tr>
+              <td style="'.$tblHeadStyle.'">ADD</td>
+              <td colspan="3" style="'.$cellStyle.';text-align:left;">'.e($add).'</td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+      <td width="2%"></td>
+      <td width="49%" style="vertical-align:top;">
+        <table width="100%" cellspacing="0" cellpadding="5">
+          <tbody>
+            <tr>
+              <td colspan="4" style="'.$tblHeadStyle.'">REFRACCIÓN CERCA</td>
+            </tr>
+            <tr>
+              <td style="'.$tblHeadStyle.';width:16%;">Ojo</td>
+              <td style="'.$tblHeadStyle.';width:28%;">Esfera</td>
+              <td style="'.$tblHeadStyle.';width:28%;">Cilindro</td>
+              <td style="'.$tblHeadStyle.';width:28%;">Eje</td>
+            </tr>
+            <tr>
+              <td style="'.$cellStyle.'">OD</td>
+              <td style="'.$cellStyle.'">'.e($esferaODC).'</td>
+              <td style="'.$cellStyle.'">'.e($cilindroODC).'</td>
+              <td style="'.$cellStyle.'">'.e($ejeODC).'</td>
+            </tr>
+            <tr>
+              <td style="'.$cellStyle.'">OI</td>
+              <td style="'.$cellStyle.'">'.e($esferaOIC).'</td>
+              <td style="'.$cellStyle.'">'.e($cilindroOIC).'</td>
+              <td style="'.$cellStyle.'">'.e($ejeOIC).'</td>
+            </tr>
+            <tr>
+              <td style="'.$tblHeadStyle.'">DP</td>
+              <td colspan="3" style="'.$cellStyle.';text-align:left;">'.e($dp).'</td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </tbody>
+</table>';
+$pdf->writeHTML($refracHtml, false, false, true, false, '');
+
+// ====== Diagnóstico & Observaciones ======
+$diagObsHtml =
+'<table width="100%" cellspacing="0" cellpadding="6" style="border:1px solid #d1d5db;margin-bottom:10px;">
+  <tbody>
+    <tr>
+      <td width="20%" style="background:#f3f4f6;"><b>Diagnóstico</b></td>
+      <td width="80%">'.e($diag).'</td>
+    </tr>
+    <tr>
+      <td width="20%" style="background:#f3f4f6;"><b>Observaciones</b></td>
+      <td width="80%">'.e($observ).'</td>
+    </tr>
+  </tbody>
+</table>';
+$pdf->writeHTML($diagObsHtml, false, false, true, false, '');
+
+// ====== Checklist TARJETAS (Material / Tratamiento / Diseño) ======
+$box = '<span style="display:inline-block;width:10px;height:10px;border:1px solid #555;margin-right:6px;"></span>';
+$cardHead = 'style="background:#fff3e0;border:1px solid #f59e0b;border-bottom:3px solid #10b981;font-weight:bold;padding:6px 8px"';
+$cardBodyTd = 'style="border-left:1px solid #f59e0b;border-right:1px solid #f59e0b;border-bottom:1px solid #f59e0b;padding:8px 10px;line-height:1.9"';
+
+$checkHtml =
+'<table width="100%" cellspacing="0" cellpadding="0" style="margin-top:10px;">
+  <tbody>
+    <tr>
+      <td width="32%">
+        <table width="100%" cellspacing="0" cellpadding="0">
+          <tbody>
+            <tr><td '.$cardHead.'>MATERIAL</td></tr>
+            <tr><td '.$cardBodyTd.'>'.
+                $box.'Resina<br>'.
+                $box.'Alto índice 1.60<br>'.
+                $box.'Alto índice 1.67<br>'.
+                $box.'Policarbonato'.
+            '</td></tr>
+          </tbody>
+        </table>
+      </td>
+      <td width="2%"></td>
+      <td width="32%">
+        <table width="100%" cellspacing="0" cellpadding="0">
+          <tbody>
+            <tr><td '.$cardHead.'>TRATAMIENTO</td></tr>
+            <tr><td '.$cardBodyTd.'>'.
+                $box.'Antirreflejo<br>'.
+                $box.'Blue-blocker<br>'.
+                $box.'Filtro UV<br>'.
+                $box.'Fotocromático'.
+            '</td></tr>
+          </tbody>
+        </table>
+      </td>
+      <td width="2%"></td>
+      <td width="32%">
+        <table width="100%" cellspacing="0" cellpadding="0">
+          <tbody>
+            <tr><td '.$cardHead.'>DISEÑO</td></tr>
+            <tr><td '.$cardBodyTd.'>'.
+                $box.'Monofocal<br>'.
+                $box.'Bifocal<br>'.
+                $box.'Multifocal tradicional<br>'.
+                $box.'Multifocal avanzado'.
+            '</td></tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </tbody>
+</table>';
+$pdf->writeHTML($checkHtml, false, false, true, false, '');
+
+// ====== Espacio + línea firma ======
+$pdf->Ln(8);
+$pdf->writeHTML(
+  '<div style="text-align:center;margin-top:14px;">
+     <span style="display:inline-block;border-top:1px solid #9ca3af;width:55%;"></span><br>
+     <span style="font-size:9px;color:#6b7280">Sello y firma profesional</span>
+   </div>',
+  false, false, true, false, ''
+);
+
+// ====== Salida ======
+if (ob_get_length()) { ob_end_clean(); }
+$pdf->Output('historia.pdf', 'I');

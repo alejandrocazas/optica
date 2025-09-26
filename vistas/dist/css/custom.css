@@ -254,3 +254,47 @@ body.hold-transition { background: var(--bg); color: var(--text); }
 a:focus, button:focus, .btn:focus{
   outline: 3px solid rgba(0,114,255,.35)!important; outline-offset: 2px;
 }
+/* Modal receta: aire y alineación */
+#modalVerhistoria .modal-body .form-group label { font-weight: 600; color: #333; }
+#modalVerhistoria .modal-body .form-group { margin-bottom: 10px; }
+#modalVerhistoria .panel { background:#f6f7fb; border-radius: 6px; padding: 8px 12px; margin-bottom: 10px; }
+#modalVerhistoria input[readonly] { background:#fafafa; }
+
+/* ====== Historia clínica – look & feel ====== */
+.modal-modern .modal-header {
+  background: #3b4361; color:#fff; border-bottom:0;
+}
+.modal-modern .modal-title { font-weight:600; letter-spacing:.2px; }
+
+.form-section {
+  background:#fff; border:1px solid #e5e7eb; border-radius:10px;
+  padding:14px 14px 8px; margin-bottom:14px;
+  box-shadow:0 2px 6px rgba(17,24,39,.05);
+}
+.form-section h5 {
+  margin:0 0 12px; font-weight:700; color:#334155; text-transform:uppercase;
+  font-size:12px; letter-spacing:.6px;
+}
+.input-soft[readonly] { background:#f8fafc; }
+
+.badge-eye {
+  display:inline-block; padding:4px 10px; border-radius:999px; font-size:11px;
+  letter-spacing:.4px; margin-bottom:8px;
+}
+.badge-eye.od { background:#e0f2fe; color:#075985; }
+.badge-eye.oi { background:#e7e5e4; color:#292524; }
+
+/* Campos compactos por columna */
+.form-compact .form-control { height:38px; padding:8px 10px; }
+
+/* Grilla de 3 columnas con separación */
+.row-gutter-8 > [class*="col-"] { padding-left:8px; padding-right:8px; }
+
+/* Línea divisoria suave */
+.hr-soft { border:0; border-top:1px dashed #e5e7eb; margin:14px 0; }
+
+/* Checkbox de diagnóstico más prolijo */
+.dx-group label { margin-right:14px; font-weight:600; color:#374151; }
+
+/* Botones footer */
+.modal-modern .modal-footer { border-top:0; }

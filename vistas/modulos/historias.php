@@ -50,7 +50,7 @@ if (!function_exists('e')) {
         <th>DP/ADD</th>
         <th>Diagnóstico</th>
         <th>Observaciones</th>
-        <th>Fecha</th>
+        <th>Fecha de Atención</th>
         <th>Acciones</th>
       </tr>
     </thead>
@@ -226,178 +226,151 @@ MODAL: REALIZAR ATENCIÓN (CREAR)
 ===================================== -->
 <div id="modalAgregarhistoria" class="modal fade" role="dialog">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content">
+    <div class="modal-content modal-modern">
       <form role="form" method="post" enctype="multipart/form-data">
-        <div class="modal-header" style="background:#5c657d;color:#fff">
+        <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">
-            <i class="fa fa-stethoscope"></i> Realizar atención al cliente
-          </h4>
+          <h4 class="modal-title"><i class="fa fa-stethoscope"></i> Realizar atención al cliente</h4>
         </div>
 
         <div class="modal-body">
-          <div class="box-body" style="padding-top:0">
 
-            <h4 class="text-muted" style="margin-top:0"><b>DATOS DEL PACIENTE</b></h4>
-            <div class="row">
+          <!-- DATOS DEL PACIENTE -->
+          <div class="form-section">
+            <h5>Datos del paciente</h5>
+            <div class="row row-gutter-8 form-compact">
               <div class="col-sm-4">
                 <label>CI/NIT</label>
                 <select class="selectpicker form-control" name="traer_cliente" id="traer_cliente"
-                        data-live-search="true" data-width="100%" title="Buscar CI/NIT...">
+                        data-live-search="true" data-width="100%" title="Buscar CI/NIT…">
                   <?php
                     $cliente = ControladorClientes::ctrMostrarClientes(null, null);
                     echo '<option></option>';
                     foreach ($cliente as $c) {
-                      echo '<option value="'.htmlspecialchars($c["id"],ENT_QUOTES,'UTF-8').'">CI: '
-                          .htmlspecialchars($c["documento"],ENT_QUOTES,'UTF-8').'</option>';
+                      echo '<option value="'.e($c["id"]).'">CI: '.e($c["documento"]).'</option>';
                     }
                   ?>
                 </select>
               </div>
-
               <div class="col-sm-4">
-                <label>Primer Nombre</label>
-                <input readonly type="text" class="form-control input-lg" id="nuevoNombre" name="nuevoNombre">
+                <label>Nombre(s)</label>
+                <input readonly type="text" class="form-control input-soft" id="nuevoNombre" name="nuevoNombre">
                 <input readonly type="hidden" id="nuevodocumentoid" name="nuevodocumentoid">
               </div>
-
               <div class="col-sm-4">
-                <label>Primer Apellido</label>
-                <input readonly type="text" class="form-control input-lg" id="nuevoapellido" name="nuevoapellido">
+                <label>Apellidos</label>
+                <input readonly type="text" class="form-control input-soft" id="nuevoapellido" name="nuevoapellido">
               </div>
 
               <div class="col-sm-4">
                 <label>Teléfono</label>
-                <input readonly type="text" class="form-control input-lg" id="nuevotelefono" name="nuevotelefono">
+                <input readonly type="text" class="form-control input-soft" id="nuevotelefono" name="nuevotelefono">
               </div>
-
               <div class="col-sm-8">
                 <label>Dirección</label>
-                <input readonly type="text" class="form-control input-lg" id="nuevadireccion" name="nuevadireccion">
+                <input readonly type="text" class="form-control input-soft" id="nuevadireccion" name="nuevadireccion">
               </div>
 
               <div class="col-sm-8">
                 <label>Anamnesis</label>
-                <input type="text" class="form-control input-lg" id="nuevoanamnesis" name="nuevoanamnesis" placeholder="Ingresar Anamnesis" required>
+                <input type="text" class="form-control" id="nuevoanamnesis" name="nuevoanamnesis" placeholder="Ingresar Anamnesis" required>
               </div>
-
               <div class="col-sm-4">
                 <label>Fecha de nacimiento</label>
-                <input type="date" class="form-control input-lg" id="nuevaedad" name="nuevaedad">
+                <input type="date" class="form-control" id="nuevaedad" name="nuevaedad">
               </div>
 
               <div class="col-sm-12">
                 <label>Antecedentes</label>
-                <input type="text" class="form-control input-lg" id="nuevoantecedentes" name="nuevoantecedentes" placeholder="Ingresar Antecedentes" required>
+                <input type="text" class="form-control" id="nuevoantecedentes" name="nuevoantecedentes" placeholder="Ingresar Antecedentes" required>
               </div>
             </div>
+          </div>
 
-            <hr>
-
-            <h4 class="text-muted"><b>REFRACCIÓN LEJOS</b></h4>
-            <div class="row">
+          <!-- REFRACCIÓN LEJOS -->
+          <div class="form-section">
+            <h5>Refracción lejos</h5>
+            <div class="row row-gutter-8 form-compact">
               <div class="col-sm-6">
-                <label class="text-muted">Ojo derecho</label>
-                <div class="row">
-                  <div class="col-xs-4">
-                    <input type="text" class="form-control input-lg" name="nuevoesferaodlj" placeholder="Esfera">
-                  </div>
-                  <div class="col-xs-4">
-                    <input type="text" class="form-control input-lg" name="nuevocilindroodlj" placeholder="Cilindro">
-                  </div>
-                  <div class="col-xs-4">
-                    <input type="text" class="form-control input-lg" name="nuevoejeodlj" placeholder="Eje">
-                  </div>
+                <span class="badge-eye od">Ojo derecho</span>
+                <div class="row row-gutter-8">
+                  <div class="col-xs-4"><input type="text" class="form-control" name="nuevoesferaodlj"    placeholder="Esfera"></div>
+                  <div class="col-xs-4"><input type="text" class="form-control" name="nuevocilindroodlj"  placeholder="Cilindro"></div>
+                  <div class="col-xs-4"><input type="text" class="form-control" name="nuevoejeodlj"       placeholder="Eje"></div>
                 </div>
               </div>
               <div class="col-sm-6">
-                <label class="text-muted">Ojo izquierdo</label>
-                <div class="row">
-                  <div class="col-xs-4">
-                    <input type="text" class="form-control input-lg" name="nuevoesferaoilj" placeholder="Esfera">
-                  </div>
-                  <div class="col-xs-4">
-                    <input type="text" class="form-control input-lg" name="nuevocilindrooilj" placeholder="Cilindro">
-                  </div>
-                  <div class="col-xs-4">
-                    <input type="text" class="form-control input-lg" name="nuevoejeoilj" placeholder="Eje">
-                  </div>
+                <span class="badge-eye oi">Ojo izquierdo</span>
+                <div class="row row-gutter-8">
+                  <div class="col-xs-4"><input type="text" class="form-control" name="nuevoesferaoilj"    placeholder="Esfera"></div>
+                  <div class="col-xs-4"><input type="text" class="form-control" name="nuevocilindrooilj"  placeholder="Cilindro"></div>
+                  <div class="col-xs-4"><input type="text" class="form-control" name="nuevoejeoilj"       placeholder="Eje"></div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <h4 class="text-muted" style="margin-top:20px"><b>REFRACCIÓN CERCA</b></h4>
-            <div class="row">
+          <!-- REFRACCIÓN CERCA -->
+          <div class="form-section">
+            <h5>Refracción cerca</h5>
+            <div class="row row-gutter-8 form-compact">
               <div class="col-sm-6">
-                <label class="text-muted">Ojo derecho</label>
-                <div class="row">
-                  <div class="col-xs-4">
-                    <input type="text" class="form-control input-lg" name="nuevoesferaodcc" placeholder="Esfera">
-                  </div>
-                  <div class="col-xs-4">
-                    <input type="text" class="form-control input-lg" name="nuevocilindroodcc" placeholder="Cilindro">
-                  </div>
-                  <div class="col-xs-4">
-                    <input type="text" class="form-control input-lg" name="nuevoejeodcc" placeholder="Eje">
-                  </div>
+                <span class="badge-eye od">Ojo derecho</span>
+                <div class="row row-gutter-8">
+                  <div class="col-xs-4"><input type="text" class="form-control" name="nuevoesferaodcc"    placeholder="Esfera"></div>
+                  <div class="col-xs-4"><input type="text" class="form-control" name="nuevocilindroodcc"  placeholder="Cilindro"></div>
+                  <div class="col-xs-4"><input type="text" class="form-control" name="nuevoejeodcc"       placeholder="Eje"></div>
                 </div>
               </div>
               <div class="col-sm-6">
-                <label class="text-muted">Ojo izquierdo</label>
-                <div class="row">
-                  <div class="col-xs-4">
-                    <input type="text" class="form-control input-lg" name="nuevoesferaoicc" placeholder="Esfera">
-                  </div>
-                  <div class="col-xs-4">
-                    <input type="text" class="form-control input-lg" name="nuevocilindrooicc" placeholder="Cilindro">
-                  </div>
-                  <div class="col-xs-4">
-                    <input type="text" class="form-control input-lg" name="nuevoejeoicc" placeholder="Eje">
-                  </div>
+                <span class="badge-eye oi">Ojo izquierdo</span>
+                <div class="row row-gutter-8">
+                  <div class="col-xs-4"><input type="text" class="form-control" name="nuevoesferaoicc"    placeholder="Esfera"></div>
+                  <div class="col-xs-4"><input type="text" class="form-control" name="nuevocilindrooicc"  placeholder="Cilindro"></div>
+                  <div class="col-xs-4"><input type="text" class="form-control" name="nuevoejeoicc"       placeholder="Eje"></div>
                 </div>
               </div>
             </div>
 
-            <div class="row" style="margin-top:10px">
+            <hr class="hr-soft">
+            <div class="row row-gutter-8 form-compact">
               <div class="col-sm-6">
                 <label>ADD</label>
-                <input type="text" class="form-control input-lg" name="nuevaADD" placeholder="ADD">
+                <input type="text" class="form-control" name="nuevaADD" placeholder="ADD">
               </div>
               <div class="col-sm-6">
                 <label>DP</label>
-                <input type="text" class="form-control input-lg" name="nuevaDP" placeholder="DP">
+                <input type="text" class="form-control" name="nuevaDP" placeholder="DP">
               </div>
             </div>
+          </div>
 
-            <hr>
-
-            <h4 class="text-muted"><b>DIAGNÓSTICO</b></h4>
-            <div class="row">
-              <div class="col-sm-12" style="line-height:2.2">
-                <label class="checkbox-inline"><input type="checkbox" name="diagnostico[]" value="MIOPIA"> MIOPIA</label>
-                <label class="checkbox-inline"><input type="checkbox" name="diagnostico[]" value="ASTIGMATISMO"> ASTIGMATISMO</label>
-                <label class="checkbox-inline"><input type="checkbox" name="diagnostico[]" value="HIPERMETROPÍA"> HIPERMETROPÍA</label>
-                <label class="checkbox-inline"><input type="checkbox" name="diagnostico[]" value="PRESBICIA"> PRESBICIA</label>
-              </div>
+          <!-- DIAGNÓSTICO -->
+          <div class="form-section">
+            <h5>Diagnóstico</h5>
+            <div class="dx-group">
+              <label class="checkbox-inline"><input type="checkbox" name="diagnostico[]" value="MIOPIA"> Miopía</label>
+              <label class="checkbox-inline"><input type="checkbox" name="diagnostico[]" value="ASTIGMATISMO"> Astigmatismo</label>
+              <label class="checkbox-inline"><input type="checkbox" name="diagnostico[]" value="HIPERMETROPÍA"> Hipermetropía</label>
+              <label class="checkbox-inline"><input type="checkbox" name="diagnostico[]" value="PRESBICIA"> Presbicia</label>
             </div>
-
             <div class="row" style="margin-top:10px">
               <div class="col-sm-12">
                 <label>Observaciones</label>
-                <input type="text" class="form-control input-lg" name="nuevaobservaciones" placeholder="Observaciones generales">
+                <input type="text" class="form-control" name="nuevaobservaciones" placeholder="Observaciones generales">
               </div>
             </div>
-
-            <!-- ====== Campos ocultos para compatibilidad (AV y Tonometría removidos visualmente) ====== -->
-            <input type="hidden" name="nuevoODsc" value="">
-            <input type="hidden" name="nuevoODcc" value="">
-            <input type="hidden" name="nuevoOIsc" value="">
-            <input type="hidden" name="nuevoOIcc" value="">
-            <input type="hidden" name="nuevacc" value="">
-            <input type="hidden" name="nuevatonoOD" value="">
-            <input type="hidden" name="nuevatonoOI" value="">
-            <input type="hidden" name="nuevatonohora" value="">
           </div>
+
+          <!-- compat -->
+          <input type="hidden" name="nuevoODsc" value="">
+          <input type="hidden" name="nuevoODcc" value="">
+          <input type="hidden" name="nuevoOIsc" value="">
+          <input type="hidden" name="nuevoOIcc" value="">
+          <input type="hidden" name="nuevacc" value="">
+          <input type="hidden" name="nuevatonoOD" value="">
+          <input type="hidden" name="nuevatonoOI" value="">
+          <input type="hidden" name="nuevatonohora" value="">
         </div>
 
         <div class="modal-footer">
@@ -415,146 +388,135 @@ MODAL: REALIZAR ATENCIÓN (CREAR)
 </div>
 
 
+
 <!-- =====================================
 MODAL: EDITAR ATENCIÓN
 ===================================== -->
 <div id="modalEditarhistoria" class="modal fade" role="dialog">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content">
+    <div class="modal-content modal-modern">
       <form role="form" method="post" enctype="multipart/form-data">
-        <div class="modal-header" style="background:#02ac66;color:#fff">
+        <div class="modal-header" style="background:#0b9a6a">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">
-            <i class="fa fa-pencil"></i> Editar atención
-          </h4>
+          <h4 class="modal-title"><i class="fa fa-pencil"></i> Editar atención</h4>
         </div>
 
         <div class="modal-body">
-          <div class="box-body" style="padding-top:0">
-
-            <h4 class="text-muted" style="margin-top:0"><b>DATOS DEL PACIENTE</b></h4>
-            <div class="row">
+          <!-- DATOS -->
+          <div class="form-section">
+            <h5>Datos del paciente</h5>
+            <div class="row row-gutter-8 form-compact">
               <div class="col-sm-4">
                 <label>CI</label>
-                <input type="text" class="form-control input-lg" id="editardocumentoid" name="editardocumentoid" maxlength="10" placeholder="CI/NIT" required>
+                <input type="text" class="form-control" id="editardocumentoid" name="editardocumentoid" maxlength="10" required>
               </div>
               <div class="col-sm-4">
-                <label>Primer Nombre</label>
-                <input type="text" class="form-control input-lg" id="editarNombre" name="editarNombre" required>
+                <label>Nombre(s)</label>
+                <input type="text" class="form-control" id="editarNombre" name="editarNombre" required>
               </div>
               <div class="col-sm-4">
-                <label>Segundo Nombre</label>
-                <input type="text" class="form-control input-lg" id="editarNombre2" name="editarNombre2">
-              </div>
-
-              <div class="col-sm-4">
-                <label>Primer Apellido</label>
-                <input type="text" class="form-control input-lg" id="editarapellido" name="editarapellido" required>
-              </div>
-              <div class="col-sm-4">
-                <label>Segundo Apellido</label>
-                <input type="text" class="form-control input-lg" id="editarapellido2" name="editarapellido2">
+                <label>Apellidos</label>
+                <input type="text" class="form-control" id="editarapellido" name="editarapellido" required>
               </div>
               <div class="col-sm-4">
                 <label>Teléfono</label>
-                <input type="text" class="form-control input-lg" id="editartelefono" name="editartelefono"
-                       data-inputmask="'mask':' +99(9) 9999-9999'" data-mask>
+                <input type="text" class="form-control" id="editartelefono" name="editartelefono" data-inputmask="'mask':' 99999999'" data-mask>
               </div>
-
               <div class="col-sm-12">
                 <label>Dirección</label>
-                <input type="text" class="form-control input-lg" id="nuevadireccion" name="nuevadireccion">
-              </div>
-
+                  <input type="text" class="form-control" id="editardireccion" name="editardireccion">
+                </div>
               <div class="col-sm-8">
                 <label>Anamnesis</label>
-                <input type="text" class="form-control input-lg" id="editaranamnesis" name="editaranamnesis" required>
+                <input type="text" class="form-control" id="editaranamnesis" name="editaranamnesis" required>
               </div>
               <div class="col-sm-4">
                 <label>Fecha de nacimiento</label>
-                <input type="date" class="form-control input-lg" id="editarnuevaedad" name="editarnuevaedad">
+                <input type="date" class="form-control" id="editarnuevaedad" name="editarnuevaedad">
               </div>
-
               <div class="col-sm-12">
                 <label>Antecedentes</label>
-                <input type="text" class="form-control input-lg" id="editarantecedentes" name="editarantecedentes" required>
+                <input type="text" class="form-control" id="editarantecedentes" name="editarantecedentes" required>
               </div>
             </div>
+          </div>
 
-            <hr>
-
-            <h4 class="text-muted"><b>REFRACCIÓN LEJOS</b></h4>
-            <div class="row">
+          <!-- LEJOS -->
+          <div class="form-section">
+            <h5>Refracción lejos</h5>
+            <div class="row row-gutter-8 form-compact">
               <div class="col-sm-6">
-                <label class="text-muted">Ojo derecho</label>
-                <div class="row">
-                  <div class="col-xs-4"><input type="text" class="form-control input-lg" id="editaresferaodlj"  name="editaresferaodlj"  placeholder="Esfera"></div>
-                  <div class="col-xs-4"><input type="text" class="form-control input-lg" id="editarcilindroodlj" name="editarcilindroodlj" placeholder="Cilindro"></div>
-                  <div class="col-xs-4"><input type="text" class="form-control input-lg" id="editarejeodlj"    name="editarejeodlj"    placeholder="Eje"></div>
+                <span class="badge-eye od">Ojo derecho</span>
+                <div class="row row-gutter-8">
+                  <div class="col-xs-4"><input type="text" class="form-control" id="editaresferaodlj"  name="editaresferaodlj"  placeholder="Esfera"></div>
+                  <div class="col-xs-4"><input type="text" class="form-control" id="editarcilindroodlj" name="editarcilindroodlj" placeholder="Cilindro"></div>
+                  <div class="col-xs-4"><input type="text" class="form-control" id="editarejeodlj"    name="editarejeodlj"    placeholder="Eje"></div>
                 </div>
               </div>
               <div class="col-sm-6">
-                <label class="text-muted">Ojo izquierdo</label>
-                <div class="row">
-                  <div class="col-xs-4"><input type="text" class="form-control input-lg" id="editaresferaoilj"  name="editaresferaoilj"  placeholder="Esfera"></div>
-                  <div class="col-xs-4"><input type="text" class="form-control input-lg" id="editarcilindrooilj" name="editarcilindrooilj" placeholder="Cilindro"></div>
-                  <div class="col-xs-4"><input type="text" class="form-control input-lg" id="editarejeoilj"    name="editarejeoilj"    placeholder="Eje"></div>
-                </div>
-              </div>
-            </div>
-
-            <h4 class="text-muted" style="margin-top:20px"><b>REFRACCIÓN CERCA</b></h4>
-            <div class="row">
-              <div class="col-sm-6">
-                <label class="text-muted">Ojo derecho</label>
-                <div class="row">
-                  <div class="col-xs-4"><input type="text" class="form-control input-lg" id="editaresferaodcc"  name="editaresferaodcc"  placeholder="Esfera"></div>
-                  <div class="col-xs-4"><input type="text" class="form-control input-lg" id="editarcilindroodcc" name="editarcilindroodcc" placeholder="Cilindro"></div>
-                  <div class="col-xs-4"><input type="text" class="form-control input-lg" id="editarejeodcc"    name="editarejeodcc"    placeholder="Eje"></div>
-                </div>
-              </div>
-              <div class="col-sm-6">
-                <label class="text-muted">Ojo izquierdo</label>
-                <div class="row">
-                  <div class="col-xs-4"><input type="text" class="form-control input-lg" id="editaresferaoicc"  name="editaresferaoicc"  placeholder="Esfera"></div>
-                  <div class="col-xs-4"><input type="text" class="form-control input-lg" id="editarcilindrooicc" name="editarcilindrooicc" placeholder="Cilindro"></div>
-                  <div class="col-xs-4"><input type="text" class="form-control input-lg" id="editarejeoicc"    name="editarejeoicc"    placeholder="Eje"></div>
+                <span class="badge-eye oi">Ojo izquierdo</span>
+                <div class="row row-gutter-8">
+                  <div class="col-xs-4"><input type="text" class="form-control" id="editaresferaoilj"  name="editaresferaoilj"  placeholder="Esfera"></div>
+                  <div class="col-xs-4"><input type="text" class="form-control" id="editarcilindrooilj" name="editarcilindrooilj" placeholder="Cilindro"></div>
+                  <div class="col-xs-4"><input type="text" class="form-control" id="editarejeoilj"    name="editarejeoilj"    placeholder="Eje"></div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <div class="row" style="margin-top:10px">
+          <!-- CERCA -->
+          <div class="form-section">
+            <h5>Refracción cerca</h5>
+            <div class="row row-gutter-8 form-compact">
+              <div class="col-sm-6">
+                <span class="badge-eye od">Ojo derecho</span>
+                <div class="row row-gutter-8">
+                  <div class="col-xs-4"><input type="text" class="form-control" id="editaresferaodcc"  name="editaresferaodcc"  placeholder="Esfera"></div>
+                  <div class="col-xs-4"><input type="text" class="form-control" id="editarcilindroodcc" name="editarcilindroodcc" placeholder="Cilindro"></div>
+                  <div class="col-xs-4"><input type="text" class="form-control" id="editarejeodcc"    name="editarejeodcc"    placeholder="Eje"></div>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <span class="badge-eye oi">Ojo izquierdo</span>
+                <div class="row row-gutter-8">
+                  <div class="col-xs-4"><input type="text" class="form-control" id="editaresferaoicc"  name="editaresferaoicc"  placeholder="Esfera"></div>
+                  <div class="col-xs-4"><input type="text" class="form-control" id="editarcilindrooicc" name="editarcilindrooicc" placeholder="Cilindro"></div>
+                  <div class="col-xs-4"><input type="text" class="form-control" id="editarejeoicc"    name="editarejeoicc"    placeholder="Eje"></div>
+                </div>
+              </div>
+            </div>
+
+            <hr class="hr-soft">
+            <div class="row row-gutter-8 form-compact">
               <div class="col-sm-6">
                 <label>ADD</label>
-                <input type="text" class="form-control input-lg" id="editarnuevaADD" name="editarnuevaADD" placeholder="ADD">
+                <input type="text" class="form-control" id="editarnuevaADD" name="editarnuevaADD" placeholder="ADD">
               </div>
               <div class="col-sm-6">
                 <label>DP</label>
-                <input type="text" class="form-control input-lg" id="editarnuevaDP" name="editarnuevaDP" placeholder="DP">
+                <input type="text" class="form-control" id="editarnuevaDP" name="editarnuevaDP" placeholder="DP">
               </div>
             </div>
+          </div>
 
-            <hr>
-
-            <h4 class="text-muted"><b>DIAGNÓSTICO</b></h4>
-            <div class="row">
-              <div class="col-sm-12" style="line-height:2.2">
-                <label class="checkbox-inline"><input type="checkbox" name="editardiagnostico[]" value="MIOPIA"> MIOPIA</label>
-                <label class="checkbox-inline"><input type="checkbox" name="editardiagnostico[]" value="ASTIGMATISMO"> ASTIGMATISMO</label>
-                <label class="checkbox-inline"><input type="checkbox" name="editardiagnostico[]" value="HIPERMETROPÍA"> HIPERMETROPÍA</label>
-                <label class="checkbox-inline"><input type="checkbox" name="editardiagnostico[]" value="PRESBICIA"> PRESBICIA</label>
-                <label class="checkbox-inline"><input type="checkbox" name="editardiagnostico[]" value="NINGUNO"> NINGUNO</label>
-              </div>
+          <!-- DIAGNÓSTICO -->
+          <div class="form-section">
+            <h5>Diagnóstico</h5>
+            <div class="dx-group">
+              <label class="checkbox-inline"><input type="checkbox" name="editardiagnostico[]" value="MIOPIA"> Miopía</label>
+              <label class="checkbox-inline"><input type="checkbox" name="editardiagnostico[]" value="ASTIGMATISMO"> Astigmatismo</label>
+              <label class="checkbox-inline"><input type="checkbox" name="editardiagnostico[]" value="HIPERMETROPÍA"> Hipermetropía</label>
+              <label class="checkbox-inline"><input type="checkbox" name="editardiagnostico[]" value="PRESBICIA"> Presbicia</label>
+              <label class="checkbox-inline"><input type="checkbox" name="editardiagnostico[]" value="NINGUNO"> Ninguno</label>
             </div>
-
             <div class="row" style="margin-top:10px">
               <div class="col-sm-12">
                 <label>Observaciones</label>
-                <input type="text" class="form-control input-lg" id="editarnuevaobservaciones" name="editarnuevaobservaciones" placeholder="Observaciones generales">
+                <input type="text" class="form-control" id="editarnuevaobservaciones" name="editarnuevaobservaciones" placeholder="Observaciones generales">
               </div>
             </div>
 
-            <!-- ====== Compatibilidad: campos ocultos de AV/PC y Tonometría ====== -->
+            <!-- compat -->
             <input type="hidden" name="editarODsc" value="">
             <input type="hidden" name="editarODcc" value="">
             <input type="hidden" name="editarOIsc" value="">
@@ -582,6 +544,7 @@ MODAL: EDITAR ATENCIÓN
     </div>
   </div>
 </div>
+
 
 
 <!-- =========================

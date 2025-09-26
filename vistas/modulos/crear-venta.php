@@ -105,9 +105,14 @@ $prods = ControladorProductos::ctrMostrarProductos(null, null, "id");
                 <!-- BOTONES AUX -->
                 <div class="form-group">
                   <div class="btn-group">
-                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modalVerhistoria">
-                      <i class="fa fa-eye"></i> Ver receta médica
-                    </button>
+                    <button type="button"
+        id="btnVerReceta"
+        class="btn btn-info"
+        data-toggle="modal"
+        data-target="#modalVerReceta">
+  <i class="fa fa-eye"></i> Ver receta médica
+</button>
+
                     <button type="button" class="btn btn-warning btnTecnologo" data-toggle="modal" data-target="#modalAlertarTecnologo">
                       <i class="fa fa-bell"></i> Alertar tecnólogo
                     </button>
@@ -324,27 +329,56 @@ $prods = ControladorProductos::ctrMostrarProductos(null, null, "id");
   $i = 1;
   if (is_array($prods)) {
     foreach ($prods as $p):
-      $img  = !empty($p['imagen']) ? $p['imagen'] : 'vistas/img/productos/default/anonymous.png';
+
+      // 1) Tomamos el valor de BD y normalizamos separadores
+      $imgDb = trim($p['imagen'] ?? '');
+      $imgDb = str_replace('\\', '/', $imgDb);
+
+      // 2) Si viene absoluta (http/https), úsala tal cual
+      if ($imgDb !== '' && (stripos($imgDb, 'http://') === 0 || stripos($imgDb, 'https://') === 0)) {
+        $imgWeb = $imgDb;
+        $fsPath = null; // no comprobamos fs
+      } else {
+        // 3) Si es relativa: si no empieza por 'vistas/', prepéndalo
+        if ($imgDb !== '' && strpos($imgDb, 'vistas/') !== 0) {
+          $imgWeb = 'vistas/img/productos/' . ltrim($imgDb, '/');
+        } else {
+          $imgWeb = $imgDb;
+        }
+
+        // 4) Construimos base de proyecto (dos niveles arriba de /vistas/modulos/)
+        $projectBase = dirname(__DIR__, 2); // => ruta absoluta al root del proyecto
+        $fsPath = $projectBase . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, ltrim($imgWeb, '/'));
+
+        // 5) Si no existe el archivo, placeholder
+        if ($imgWeb === '' || !is_file($fsPath)) {
+          $imgWeb = 'vistas/img/productos/default/anonymous.png';
+        }
+      }
+
       $desc = h($p['descripcion'] ?? '');
 
-      // Nombre de categoría robusto
+      // categoría
       $catName = '';
-      if (isset($p['categoria']) && $p['categoria'] !== '') {
+      if (!empty($p['categoria'])) {
         $catName = $p['categoria'];
-      } elseif (isset($p['id_categoria'])) {
-        $catRow = ControladorCategorias::ctrMostrarCategorias("id", $p['id_categoria']);
+      } elseif (!empty($p['id_categoria'])) {
+        $catRow = ControladorCategorias::ctrMostrarCategorias('id', $p['id_categoria']);
         $catName = $catRow['categoria'] ?? '';
       }
       $catName = h($catName);
 
-      $cod  = h($p['codigo'] ?? '');
-      $pre  = isset($p['precio_venta']) ? number_format((float)$p['precio_venta'], 0, ',', '.') : '0';
-      $stk  = (int)($p['stock'] ?? 0);
+      $cod   = h($p['codigo'] ?? '');
+      $pre   = isset($p['precio_venta']) ? number_format((float)$p['precio_venta'], 0, ',', '.') : '0';
+      $stk   = (int)($p['stock'] ?? 0);
       $badge = ($stk < 10) ? 'bg-red' : (($stk <= 20) ? 'bg-yellow' : 'bg-green');
 ?>
   <tr>
     <td><?= $i++; ?></td>
-    <td><img src="<?= h($img); ?>" alt="" style="width:38px;height:38px;border-radius:6px"></td>
+    <td>
+      <img src="<?= h($imgWeb); ?>" alt=""
+           style="width:38px;height:38px;border-radius:6px;object-fit:cover;">
+    </td>
     <td><?= $desc; ?></td>
     <td><?= $catName; ?></td>
     <td class="text-monospace"><?= $cod; ?></td>
@@ -355,6 +389,8 @@ $prods = ControladorProductos::ctrMostrarProductos(null, null, "id");
     endforeach;
   }
 ?>
+
+
               </tbody>
             </table>
           </div>
@@ -370,161 +406,159 @@ $prods = ControladorProductos::ctrMostrarProductos(null, null, "id");
 <!-- ========================= -->
 <!--   MODAL: VER RECETA       -->
 <!-- ========================= -->
-<div id="modalVerhistoria" class="modal fade" role="dialog">
+<!-- ================================
+     MODAL: BUSCAR / VER RECETA
+================================ -->
+<div id="modalVerReceta" class="modal fade" role="dialog">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <div class="modal-header" style="background:#666F88;color:#fff">
+
+      <div class="modal-header" style="background:#5c657d;color:#fff">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title"><strong><i class="ion ion-arrow-right-a"></i> BUSCAR RECETA MÉDICA</strong></h4>
+        <h4 class="modal-title"><i class="fa fa-user-md"></i> Buscar receta médica</h4>
       </div>
-      <div class="modal-body">
-        <div class="box-body">
-          <div class="panel"><h3><b>DATOS DEL PACIENTE</b></h3></div>
 
-          <div class="form-group">
-            <label>CI/NIT</label>
-            <select class="selectpicker" name="traer_historia" id="traer_historia"
-                    data-live-search="true" data-width="100%" title="CONSULTAR AQUÍ">
-              <?php
-                $hist = ControladorHistorias::ctrMostrarHistorias(null, null);
-                echo '<option></option>';
-                foreach($hist as $hrow){
-                  echo '<option value="'.$hrow["id"].'"> CI: '.$hrow["documentoid"].' | N° Atención: '.$hrow["id"].'</option>';
-                }
-              ?>
-            </select>
+      <div class="modal-body" style="padding-top:10px">
+        <!-- Datos del paciente -->
+        <div class="box" style="border:1px solid #e5e7eb">
+          <div class="box-header" style="background:#f3f4f6;border-bottom:1px solid #e5e7eb">
+            <h4 class="box-title" style="margin:8px 0">Datos del paciente</h4>
           </div>
+          <div class="box-body">
+            <div class="row">
+              <div class="col-sm-4">
+                <label>CI/NIT</label>
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-id-card"></i></span>
+                  <input type="text" class="form-control" id="rx_doc_ci" readonly>
+                </div>
+                <small class="text-muted" id="rx_num_atencion"></small>
+              </div>
 
-          <div class="row">
-            <div class="col-sm-4">
-              <label>Primer Nombre</label>
-              <input readonly type="text" class="form-control input-lg" id="nuevoNombre">
-              <input readonly type="hidden" id="id_historia">
-            </div>
-            <div class="col-sm-4">
-              <label>Primer Apellido</label>
-              <input readonly type="text" class="form-control input-lg" id="nuevoapellido">
-            </div>
-            <div class="col-sm-4">
-              <label>Teléfono</label>
-              <input readonly type="text" class="form-control input-lg" id="nuevotelefono">
-            </div>
-          </div>
+              <div class="col-sm-4">
+                <label>Primer Nombre</label>
+                <input type="text" class="form-control" id="rx_nombre" readonly>
+              </div>
 
-          <div class="row" style="margin-top:10px">
-            <div class="col-sm-4">
-              <label>Fecha</label>
-              <input readonly type="text" class="form-control input-lg" id="nuevafecha">
-            </div>
-            <div class="col-sm-8">
-              <label>Dirección</label>
-              <input readonly type="text" class="form-control input-lg" id="nuevadireccion">
-            </div>
-          </div>
+              <div class="col-sm-4">
+                <label>Primer Apellido</label>
+                <input type="text" class="form-control" id="rx_apellido" readonly>
+              </div>
 
-          <div class="form-group" style="margin-top:10px">
-            <label>Anamnesis</label>
-            <input readonly type="text" class="form-control input-lg" id="nuevoanamnesis">
-          </div>
+              <div class="col-sm-4">
+                <label>Teléfono</label>
+                <input type="text" class="form-control" id="rx_telefono" readonly>
+              </div>
 
-          <div class="form-group">
-            <label>Antecedentes</label>
-            <input readonly type="text" class="form-control input-lg" id="nuevoantecedentes">
-          </div>
+              <div class="col-sm-8">
+                <label>Dirección</label>
+                <input type="text" class="form-control" id="rx_direccion" readonly>
+              </div>
 
-          <!-- Refracciones -->
-          <div class="panel"><h3><b>REFRACCIÓN LEJOS</b></h3></div>
-          <div class="row">
-            <div class="col-sm-4">
-              <label>OD Esfera</label>
-              <input readonly type="text" class="form-control input-lg" id="nuevoesferaodlj">
-            </div>
-            <div class="col-sm-4">
-              <label>OD Cilindro</label>
-              <input readonly type="text" class="form-control input-lg" id="nuevocilindroodlj">
-            </div>
-            <div class="col-sm-4">
-              <label>OD Eje</label>
-              <input readonly type="text" class="form-control input-lg" id="nuevoejeodlj">
-            </div>
-          </div>
-          <div class="row" style="margin-top:10px">
-            <div class="col-sm-4">
-              <label>OI Esfera</label>
-              <input readonly type="text" class="form-control input-lg" id="nuevoesferaoilj">
-            </div>
-            <div class="col-sm-4">
-              <label>OI Cilindro</label>
-              <input readonly type="text" class="form-control input-lg" id="nuevocilindrooilj">
-            </div>
-            <div class="col-sm-4">
-              <label>OI Eje</label>
-              <input readonly type="text" class="form-control input-lg" id="nuevoejeoilj">
-            </div>
-          </div>
+              <div class="col-sm-12">
+                <label>Anamnesis</label>
+                <input type="text" class="form-control" id="rx_anamnesis" readonly>
+              </div>
 
-          <div class="panel" style="margin-top:10px"><h3><b>REFRACCIÓN CERCA</b></h3></div>
-          <div class="row">
-            <div class="col-sm-4">
-              <label>OD Esfera</label>
-              <input readonly type="text" class="form-control input-lg" id="nuevoesferaodcc">
-            </div>
-            <div class="col-sm-4">
-              <label>OD Cilindro</label>
-              <input readonly type="text" class="form-control input-lg" id="nuevocilindroodcc">
-            </div>
-            <div class="col-sm-4">
-              <label>OD Eje</label>
-              <input readonly type="text" class="form-control input-lg" id="nuevoejeodcc">
+              <div class="col-sm-12">
+                <label>Antecedentes</label>
+                <input type="text" class="form-control" id="rx_antecedentes" readonly>
+              </div>
             </div>
           </div>
-          <div class="row" style="margin-top:10px">
-            <div class="col-sm-4">
-              <label>OI Esfera</label>
-              <input readonly type="text" class="form-control input-lg" id="nuevoesferaoicc">
-            </div>
-            <div class="col-sm-4">
-              <label>OI Cilindro</label>
-              <input readonly type="text" class="form-control input-lg" id="nuevocilindrooicc">
-            </div>
-            <div class="col-sm-4">
-              <label>OI Eje</label>
-              <input readonly type="text" class="form-control input-lg" id="nuevoejeoicc">
-            </div>
-          </div>
-
-          <div class="row" style="margin-top:10px">
-            <div class="col-sm-6">
-              <label>ADD</label>
-              <input readonly type="text" class="form-control input-lg" id="nuevaADD">
-            </div>
-            <div class="col-sm-6">
-              <label>DP</label>
-              <input readonly type="text" class="form-control input-lg" id="nuevaDP">
-            </div>
-          </div>
-
-          <div class="panel" style="margin-top:10px"><h3><b>DIAGNÓSTICO</b></h3></div>
-          <div class="form-group">
-            <label>Patologías</label>
-            <input readonly type="text" class="form-control input-lg" id="nuevaPatologia">
-          </div>
-
-          <!-- Observaciones -->
-          <div class="panel"><h3><b>OBSERVACIONES</b></h3></div>
-          <div class="form-group">
-            <input readonly type="text" class="form-control input-lg" id="nuevaobservaciones">
-          </div>
-
         </div>
-      </div>
+
+        <!-- Refracción: LEJOS -->
+        <div class="box" style="border:1px solid #dbeafe">
+          <div class="box-header" style="background:#eaf4ff;border-bottom:1px solid #60a5fa">
+            <h4 class="box-title" style="margin:8px 0">Refracción lejos</h4>
+          </div>
+          <div class="box-body">
+            <div class="row">
+              <div class="col-sm-4">
+                <label>OD Esfera</label>
+                <input type="text" class="form-control" id="rx_lejos_od_esfera" readonly>
+              </div>
+              <div class="col-sm-4">
+                <label>OD Cilindro</label>
+                <input type="text" class="form-control" id="rx_lejos_od_cilindro" readonly>
+              </div>
+              <div class="col-sm-4">
+                <label>OD Eje</label>
+                <input type="text" class="form-control" id="rx_lejos_od_eje" readonly>
+              </div>
+
+              <div class="col-sm-4">
+                <label>OI Esfera</label>
+                <input type="text" class="form-control" id="rx_lejos_oi_esfera" readonly>
+              </div>
+              <div class="col-sm-4">
+                <label>OI Cilindro</label>
+                <input type="text" class="form-control" id="rx_lejos_oi_cilindro" readonly>
+              </div>
+              <div class="col-sm-4">
+                <label>OI Eje</label>
+                <input type="text" class="form-control" id="rx_lejos_oi_eje" readonly>
+              </div>
+
+              <div class="col-sm-4">
+                <label>ADD</label>
+                <input type="text" class="form-control" id="rx_add" readonly>
+              </div>
+              <div class="col-sm-4">
+                <label>DP</label>
+                <input type="text" class="form-control" id="rx_dp" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Refracción: CERCA -->
+        <div class="box" style="border:1px solid #d1fae5">
+          <div class="box-header" style="background:#ecfdf5;border-bottom:1px solid #34d399">
+            <h4 class="box-title" style="margin:8px 0">Refracción cerca</h4>
+          </div>
+          <div class="box-body">
+            <div class="row">
+              <div class="col-sm-4">
+                <label>OD Esfera</label>
+                <input type="text" class="form-control" id="rx_cerca_od_esfera" readonly>
+              </div>
+              <div class="col-sm-4">
+                <label>OD Cilindro</label>
+                <input type="text" class="form-control" id="rx_cerca_od_cilindro" readonly>
+              </div>
+              <div class="col-sm-4">
+                <label>OD Eje</label>
+                <input type="text" class="form-control" id="rx_cerca_od_eje" readonly>
+              </div>
+
+              <div class="col-sm-4">
+                <label>OI Esfera</label>
+                <input type="text" class="form-control" id="rx_cerca_oi_esfera" readonly>
+              </div>
+              <div class="col-sm-4">
+                <label>OI Cilindro</label>
+                <input type="text" class="form-control" id="rx_cerca_oi_cilindro" readonly>
+              </div>
+              <div class="col-sm-4">
+                <label>OI Eje</label>
+                <input type="text" class="form-control" id="rx_cerca_oi_eje" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /.modal-body -->
+
       <div class="modal-footer">
-        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Salir</button>
-        <button class="btn btn-primary btnImprimirhistoria" id="historiaventa"><i class="fa fa-file-text-o"></i></button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
       </div>
+
     </div>
   </div>
 </div>
+
 
 <!-- ========================= -->
 <!--   MODAL: ALERTAR TECN.    -->
@@ -616,7 +650,9 @@ $prods = ControladorProductos::ctrMostrarProductos(null, null, "id");
 <!--  JS de líneas y totales   -->
 <!-- ========================= -->
 <script>
-// Recalcular importes
+/* =========================
+   TOTALES (sin impuestos)
+   ========================= */
 function SumarDatosFinancieros(){
   var sub = parseFloat((document.getElementById('totalVenta')?.value || "0").replace(',', '.')) || 0;
 
@@ -635,17 +671,17 @@ function SumarDatosFinancieros(){
 
   var saldo = total - abono;
 
-  document.getElementById('nuevoTotalVenta').value = sub.toFixed(2);
-  document.getElementById('nuevoTotalFinal').value = total.toFixed(2);
-  document.getElementById('totalVentaFinal').value = total.toFixed(2);
-  document.getElementById('abonoNeto').value = abono.toFixed(2);
-  document.getElementById('SaldoPendiente').value = saldo.toFixed(2);
+  document.getElementById('nuevoTotalVenta').value   = sub.toFixed(2);
+  document.getElementById('nuevoTotalFinal').value   = total.toFixed(2);
+  document.getElementById('totalVentaFinal').value   = total.toFixed(2);
+  document.getElementById('abonoNeto').value         = abono.toFixed(2);
+  document.getElementById('SaldoPendiente').value    = saldo.toFixed(2);
 
-  // Ocultos que algunos controladores exigen
+  // campos ocultos esperados por el backend
   var impuesto = 0;
-  document.getElementById('nuevoImpuestoVenta').value   = impuesto.toFixed(2);
-  document.getElementById('nuevoPrecioImpuesto').value  = (sub * (impuesto/100)).toFixed(2);
-  document.getElementById('nuevoPrecioNeto').value      = sub.toFixed(2);
+  document.getElementById('nuevoImpuestoVenta').value  = impuesto.toFixed(2);
+  document.getElementById('nuevoPrecioImpuesto').value = (sub * (impuesto/100)).toFixed(2);
+  document.getElementById('nuevoPrecioNeto').value     = sub.toFixed(2);
 
   var forma = (document.getElementById('nuevoFormaPago')?.value || '').toUpperCase();
   document.getElementById('nuevoMetodoPago').value = 'Efectivo';
@@ -654,16 +690,19 @@ function SumarDatosFinancieros(){
   });
 }
 
-// ===== util JS para escapar texto en plantillas (evita usar h() PHP en JS)
+// util para escapar texto al inyectar HTML
 function esc(s){
   return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]); });
 }
 
-// Gestionar líneas
+/* =========================
+   LÍNEAS DE VENTA (ÚNICO)
+   ========================= */
 (function(){
   var btnAdd = document.getElementById('btnAgregarProductoBusqueda');
   var selProd = document.getElementById('buscarProducto');
   var tbody = document.querySelector('#tablaLineas tbody');
+  var form = document.querySelector('form.formularioVenta');
 
   function recalcTotals(){
     var total = 0;
@@ -677,25 +716,26 @@ function esc(s){
   }
 
   function addLineFromOption(opt){
-    var id = opt.value;
+    var id     = opt.value;
     var codigo = opt.getAttribute('data-codigo') || '';
-    var desc = opt.getAttribute('data-descripcion') || '';
-    var price = parseFloat(opt.getAttribute('data-precio') || '0') || 0;
-    var stock = parseInt(opt.getAttribute('data-stock') || '0') || 0;
+    var desc   = opt.getAttribute('data-descripcion') || '';
+    var price  = parseFloat(opt.getAttribute('data-precio') || '0') || 0;
+    var stock  = parseInt(opt.getAttribute('data-stock') || '0') || 0;
 
-    // Si ya existe la línea, solo incrementa cantidad si hay stock
+    // Si ya existe la línea, incrementa hasta el stock máximo
     var existing = tbody.querySelector('tr[data-id="'+id+'"]');
     if (existing){
       var qtyInput = existing.querySelector('.js-qty');
-      var current = parseInt(qtyInput.value || '1') || 1;
-      if (current + 1 > stock) { alert('Stock insuficiente.'); return; }
-      qtyInput.value = current + 1;
-      var sub = (price * (current + 1));
-      existing.querySelector('.js-sub').textContent = sub.toFixed(2);
+      var current  = parseInt(qtyInput.value || '1') || 1;
+      var next     = current + 1;
+      if (next > stock) { alert('Stock insuficiente.'); return; }
+      qtyInput.value = next;
+      existing.querySelector('.js-sub').textContent = (price * next).toFixed(2);
       recalcTotals();
       return;
     }
 
+    // Nueva fila con cantidad 1 por defecto
     var tr = document.createElement('tr');
     tr.setAttribute('data-id', id);
     tr.setAttribute('data-codigo', codigo);
@@ -715,20 +755,30 @@ function esc(s){
   }
 
   if (btnAdd && selProd){
+    // única vinculación del botón
     btnAdd.addEventListener('click', function(){
       var opt = selProd.options[selProd.selectedIndex];
       if (!opt || !opt.value) { alert('Selecciona un producto.'); return; }
       addLineFromOption(opt);
     });
+
+    // permitir Enter en el select para añadir
+    selProd.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        btnAdd.click();
+      }
+    });
   }
 
+  // cambios de cantidad
   tbody.addEventListener('input', function(e){
     var el = e.target;
     if (el.classList.contains('js-qty')){
-      var tr = el.closest('tr');
+      var tr    = el.closest('tr');
       var price = parseFloat(tr.getAttribute('data-price') || '0') || 0;
       var stock = parseInt(tr.getAttribute('data-stock') || '0') || 0;
-      var qty = parseInt(el.value || '1') || 1;
+      var qty   = parseInt(el.value || '1') || 1;
       if (qty < 1) qty = 1;
       if (qty > stock) qty = stock;
       el.value = qty;
@@ -737,6 +787,7 @@ function esc(s){
     }
   });
 
+  // eliminar línea
   tbody.addEventListener('click', function(e){
     var btn = e.target.closest('.js-del');
     if (!btn) return;
@@ -745,8 +796,7 @@ function esc(s){
     recalcTotals();
   });
 
-  // Serializar y validar antes de enviar
-  var form = document.querySelector('form.formularioVenta');
+  // serializar antes de enviar + validaciones
   function serializeLineas(){
     var rows = tbody.querySelectorAll('tr');
     var payload = [];
@@ -788,153 +838,12 @@ function esc(s){
         alert('El total debe ser mayor a 0.');
         return;
       }
-      // submit continua
+      // si pasa validación, deja enviar
     });
   }
-})();
-
-// Implementación alternativa (de respaldo) para añadir/serializar (puedes dejarla)
-(function() {
-  const $sel = document.getElementById('buscarProducto');
-  const $btn = document.getElementById('btnAgregarProductoBusqueda');
-  const $wrap = document.querySelector('.nuevoProducto');
-  const $totalOculto = document.getElementById('totalVenta');
-  const $totalVis = document.getElementById('nuevoTotalVenta');
-  const $lista = document.getElementById('listaProductos');
-
-  if (!$sel || !$btn || !$wrap) return;
-
-  function ensureTable() {
-    if ($wrap.querySelector('table')) return;
-    const table = document.createElement('table');
-    table.className = 'table table-condensed';
-    table.innerHTML = `
-      <thead>
-        <tr>
-          <th style="width:40%">Producto</th>
-          <th style="width:15%">Precio</th>
-          <th style="width:15%">Cant.</th>
-          <th style="width:20%">Subtotal</th>
-          <th style="width:10%"></th>
-        </tr>
-      </thead>
-      <tbody></tbody>`;
-    $wrap.appendChild(table);
-  }
-
-  function number(n){ return parseFloat((n||'0').toString().replace(',', '.')) || 0; }
-  function money(n){ return (Number(n)||0).toFixed(2); }
-
-  function recalc() {
-    const rows = $wrap.querySelectorAll('tbody tr');
-    let sub = 0;
-    rows.forEach(tr => {
-      const qty = number(tr.querySelector('.js-qty').value);
-      const price = number(tr.dataset.price);
-      const st = qty * price;
-      tr.querySelector('.js-sub').textContent = money(st);
-      sub += st;
-    });
-    $totalOculto.value = money(sub);
-    $totalVis.value = money(sub);
-    if (typeof SumarDatosFinancieros === 'function') SumarDatosFinancieros();
-    serialize();
-  }
-
-  function serialize() {
-    const rows = $wrap.querySelectorAll('tbody tr');
-    const payload = [];
-    rows.forEach(tr => {
-      payload.push({
-        id: tr.dataset.id,
-        codigo: tr.dataset.codigo,
-        descripcion: tr.querySelector('.js-desc') ? tr.querySelector('.js-desc').textContent.trim() : '',
-        cantidad: Number(tr.querySelector('.js-qty')?.value || 0),
-        stock: Number(tr.dataset.stock || 0),
-        precio: Number(tr.dataset.price || 0),
-        total: Number(tr.querySelector('.js-sub')?.textContent || 0)
-      });
-    });
-    $lista.value = JSON.stringify(payload);
-  }
-
-  function addOrInc({id, codigo, desc, price, stock}) {
-    ensureTable();
-    const tbody = $wrap.querySelector('tbody');
-    let row = tbody.querySelector('tr[data-id="'+id+'"]');
-
-    if (row) {
-      const qtyInput = row.querySelector('.js-qty');
-      let qty = Number(qtyInput.value) + 1;
-      if (qty > stock) qty = stock;
-      qtyInput.value = qty;
-    } else {
-      row = document.createElement('tr');
-      row.dataset.id = id;
-      row.dataset.codigo = codigo;
-      row.dataset.price = price;
-      row.dataset.stock = stock;
-      row.innerHTML = `
-        <td class="js-desc text-uppercase">${esc(desc)}</td>
-        <td>$ <span class="js-price">${money(price)}</span></td>
-        <td>
-          <input type="number" class="form-control input-sm js-qty" value="1" min="1" max="${stock}">
-          <small class="text-muted">Stock: ${stock}</small>
-        </td>
-        <td>$ <span class="js-sub">${money(price)}</span></td>
-        <td>
-          <button type="button" class="btn btn-danger btn-xs js-del"><i class="fa fa-trash"></i></button>
-        </td>`;
-      tbody.appendChild(row);
-    }
-    recalc();
-  }
-
-  $wrap.addEventListener('input', function(e){
-    if (e.target.classList.contains('js-qty')) {
-      const tr = e.target.closest('tr');
-      const max = Number(tr.dataset.stock);
-      let v = Number(e.target.value || 1);
-      if (v < 1) v = 1;
-      if (v > max) v = max;
-      e.target.value = v;
-      recalc();
-    }
-  });
-  $wrap.addEventListener('click', function(e){
-    if (e.target.closest('.js-del')) {
-      const tr = e.target.closest('tr');
-      tr.parentNode.removeChild(tr);
-      if (!$wrap.querySelector('tbody tr')) $wrap.innerHTML = '';
-      recalc();
-    }
-  });
-
-  $btn.addEventListener('click', function(){
-    const opt = $sel.options[$sel.selectedIndex];
-    if (!opt || !opt.value) return;
-
-    const id = opt.value;
-    const codigo = opt.getAttribute('data-codigo') || '';
-    const desc = (opt.getAttribute('data-descripcion') || '').trim();
-    const price = number(opt.getAttribute('data-precio'));
-    const stock = Number(opt.getAttribute('data-stock')) || 0;
-
-    if (stock <= 0) {
-      alert('Sin stock disponible para este producto.');
-      return;
-    }
-    addOrInc({id, codigo, desc, price, stock});
-  });
-
-  $sel.addEventListener('keydown', function(e){
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      $btn.click();
-    }
-  });
 })();
 </script>
+
 
 <!-- ========================= -->
 <!--  SweetAlert2 + Triggers   -->
@@ -1009,6 +918,92 @@ $clienteErrorMsg     = !empty($_SESSION['cliente_error']) ? $_SESSION['cliente_e
   });
   <?php endif; ?>
 })();
+
+<script>
+// helper para poner Mayúscula Inicial
+function properCase(s){ return (s||'').toString()
+  .toLowerCase().replace(/(^|\s)\p{L}/gu,m=>m.toUpperCase()); }
+// helper que intenta varias llaves (por si cambian nombres en BD)
+function pick(row, keys, def=''){ for (var k of keys){ if (row && row[k]!=null && row[k]!== '') return row[k]; } return def; }
+// limpia teléfono a dígitos y +
+function cleanPhone(s){ s = String(s||''); // deja + y dígitos
+  return s.replace(/[^\d+]/g,''); }
+// muestra valor en input (si existe)
+function setVal(id, val){ var el = document.getElementById(id); if(el){ el.value = val; } }
+
+$(function(){
+
+  // Quita máscara automática si algún plugin la aplica globalmente
+  $('#modalVerhistoria').on('shown.bs.modal', function(){
+    var $t = $('#nuevotelefono');
+    if ($t.inputmask) $t.inputmask('remove');
+  });
+
+  // Al elegir una historia
+  $('#traer_historia').on('changed.bs.select', function(){
+    var id = $(this).val(); if (!id) return;
+
+    $.ajax({
+      url: 'ajax/historias.ajax.php',
+      method: 'POST',
+      data: { idhistoria: id },
+      dataType: 'json'
+    }).done(function(row){
+      if(!row || row.ok === false){
+        toastr && toastr.error ? toastr.error('No se pudo traer la historia') : alert('No se pudo traer la historia');
+        return;
+      }
+
+      // ====== DATOS BÁSICOS ======
+      setVal('nuevoNombre',    properCase(pick(row, ['primernombre','nombre','primer_nombre'])));
+      setVal('nuevoapellido',  properCase(pick(row, ['primerapellido','apellido','primer_apellido'])));
+      setVal('nuevotelefono',  cleanPhone(pick(row, ['telefono','celular','telefono1','telefono_contacto'])));
+      setVal('nuevadireccion', pick(row, ['direccion','direcciondomicilio','dir','domicilio']));
+
+      // fecha (formato visible)
+      var f = pick(row, ['fecha','created_at','updated_at','fechahistoria']);
+      if (f) {
+        f = String(f).replace('T',' ');
+        setVal('nuevafecha', f.length>16 ? f.substr(0,16) : f);
+      } else {
+        setVal('nuevafecha','');
+      }
+
+      // ====== REFRACCIÓN LEJOS ======
+      // OJO DERECHO (OD) lejos
+      setVal('nuevoesferaodlj',   pick(row, ['esferaodlj','od_esfera_lj','esfera_od_lejos','od_esfera_lejos']));
+      setVal('nuevocilindroodlj', pick(row, ['cilindroodlj','od_cilindro_lj','cilindro_od_lejos','od_cilindro_lejos']));
+      setVal('nuevoejeodlj',      pick(row, ['ejeodlj','od_eje_lj','eje_od_lejos','od_eje_lejos']));
+
+      // OJO IZQUIERDO (OI) lejos
+      setVal('nuevoesferaoilj',   pick(row, ['esferaoilj','oi_esfera_lj','esfera_oi_lejos','oi_esfera_lejos']));
+      setVal('nuevocilindrooilj', pick(row, ['cilindrooilj','oi_cilindro_lj','cilindro_oi_lejos','oi_cilindro_lejos']));
+      setVal('nuevoejeoilj',      pick(row, ['ejeoilj','oi_eje_lj','eje_oi_lejos','oi_eje_lejos']));
+
+      // ====== REFRACCIÓN CERCA (si tienes esos campos) ======
+      setVal('nuevoesferaodcc',   pick(row, ['esferaodcc','od_esfera_cc','esfera_od_cerca','od_esfera_cerca']));
+      setVal('nuevocilindroodcc', pick(row, ['cilindroodcc','od_cilindro_cc','cilindro_od_cerca','od_cilindro_cerca']));
+      setVal('nuevoejeodcc',      pick(row, ['ejeodcc','od_eje_cc','eje_od_cerca','od_eje_cerca']));
+
+      setVal('nuevoesferaoicc',   pick(row, ['esferaoicc','oi_esfera_cc','esfera_oi_cerca','oi_esfera_cerca']));
+      setVal('nuevocilindrooicc', pick(row, ['cilindrooicc','oi_cilindro_cc','cilindro_oi_cerca','oi_cilindro_cerca']));
+      setVal('nuevoejeoicc',      pick(row, ['ejeoicc','oi_eje_cc','eje_oi_cerca','oi_eje_cerca']));
+
+      // Otros campos
+      setVal('nuevoanamnesis',    pick(row, ['anamnesis','anamnesis_texto','motivo']));
+      setVal('nuevoantecedentes', pick(row, ['antecedentes','antecedentes_texto']));
+      setVal('nuevaADD',          pick(row, ['add','adicion','adicion_total']));
+      setVal('nuevaDP',           pick(row, ['dp','distanciapupilar','distancia_pupilar']));
+      setVal('nuevaPatologia',    pick(row, ['patologias','diagnostico','dx']));
+      setVal('nuevaobservaciones',pick(row, ['observaciones','observacion','obs']));
+
+    }).fail(function(){
+      alert('Error al consultar la historia.');
+    });
+  });
+});
+</script>
+
 </script>
 <?php
 // limpiar flags para que no se repitan

@@ -1,6 +1,14 @@
 <?php
 
 class Controladorhistorias{
+	
+	
+
+   /* Última historia por cliente */
+  static public function ctrUltimaHistoriaPorCliente($idCliente){
+    $tabla = "historias";
+    return ModeloHistorias::mdlUltimaHistoriaPorCliente($tabla, (int)$idCliente);
+  }
 
 	/*=============================================
 	REGISTRO DE historia
@@ -102,14 +110,11 @@ class Controladorhistorias{
 	MOSTRAR historia
 	=============================================*/
 
-	static public function ctrMostrarhistorias($item, $valor){
-
-		$tabla = "historias";
-
-		$respuesta = Modelohistorias::MdlMostrarhistorias($tabla, $item, $valor);
-
-		return $respuesta;
-	}
+	/* Listar/mostrar */
+  static public function ctrMostrarhistorias($item, $valor){
+    $tabla = "historias";
+    return ModeloHistorias::mdlMostrarHistorias($tabla, $item, $valor);
+  }
 
 	/*=============================================
 	EDITAR historia
@@ -239,6 +244,10 @@ class Controladorhistorias{
 		}
 
 	}
+// controladores/historias.controlador.php
+static public function ctrMostrarUltimaHistoriaPorCliente($clienteId = null, $documento = null) {
+  return Modelohistorias::mdlUltimaHistoriaPorCliente('historias', $clienteId, $documento);
+}
 
 
 }

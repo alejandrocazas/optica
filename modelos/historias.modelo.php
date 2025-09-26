@@ -36,6 +36,22 @@ class Modelohistorias{
 		$stmt = null;
 
 	}
+	/* ===== Última historia por cliente ===== */
+  
+  // modelos/historias.modelo.php
+static public function mdlUltimaHistoriaPorCliente($tabla, $clienteId = null, $documento = null) {
+  $db = Conexion::conectar();
+  if ($clienteId) {
+    $stmt = $db->prepare("SELECT * FROM $tabla WHERE id_cliente = :id ORDER BY id DESC LIMIT 1");
+    $stmt->bindParam(':id', $clienteId, PDO::PARAM_INT);
+  } else {
+    $stmt = $db->prepare("SELECT * FROM $tabla WHERE documentoid = :doc ORDER BY id DESC LIMIT 1");
+    $stmt->bindParam(':doc', $documento, PDO::PARAM_STR);
+  }
+  $stmt->execute();
+  return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+}
+
 
 	/*=============================================
 	REGISTRO DE historia
@@ -213,5 +229,7 @@ class Modelohistorias{
 
 
 	}
+
+	
 
 }

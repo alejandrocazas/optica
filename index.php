@@ -23,8 +23,7 @@ require_once "modelos/historias.modelo.php";
 require_once "modelos/configuraciones.modelo.php";
 require_once "modelos/alerta.modelo.php";
 
-
-
-
 $plantilla = new ControladorPlantilla();
 $plantilla -> ctrPlantilla();
+
+

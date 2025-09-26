@@ -1,126 +1,86 @@
 <?php
+// ajax/datatable-productos.ajax.php
+declare(strict_types=1);
 
-require_once "../controladores/productos.controlador.php";
-require_once "../modelos/productos.modelo.php";
+// Forzamos JSON limpio (sin notices)
+header('Content-Type: application/json; charset=utf-8');
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
 
-require_once "../controladores/categorias.controlador.php";
-require_once "../modelos/categorias.modelo.php";
-
-
-class TablaProductos{
-
- 	/*=============================================
- 	 MOSTRAR LA TABLA DE PRODUCTOS
-  	=============================================*/ 
-
-	public function mostrarTablaProductos(){
-
-		$item = null;
-    	$valor = null;
-    	$orden = "id";
-
-  		$productos = ControladorProductos::ctrMostrarProductos($item, $valor, $orden);	
-
-  		if(count($productos) == 0){
-
-  			echo '{"data": []}';
-
-		  	return;
-  		}
-		
-  		$datosJson = '{
-		  "data": [';
-
-		  for($i = 0; $i < count($productos); $i++){
-
-		  	if ($productos[$i]["stock"] > 0) {
-
-		  	/*=============================================
- 	 		TRAEMOS LA IMAGEN
-  			=============================================*/ 
-
-		  	$imagen = "<img src='".$productos[$i]["imagen"]."' width='40px'>";
-
-		  	/*=============================================
- 	 		TRAEMOS LA CATEGORÍA
-  			=============================================*/ 
-
-		  	$item = "id";
-		  	$valor = $productos[$i]["id_categoria"];
-
-		  	$categorias = ControladorCategorias::ctrMostrarCategorias($item, $valor);
-
-		  	/*=============================================
- 	 		STOCK
-  			=============================================*/ 
-
-  			if($productos[$i]["stock"] <= 10){
-
-  				$stock = "<button class='btn btn-danger'>".$productos[$i]["stock"]."</button>";
-
-  			}else if($productos[$i]["stock"] > 11 && $productos[$i]["stock"] <= 15){
-
-  				$stock = "<button class='btn btn-warning'>".$productos[$i]["stock"]."</button>";
-
-  			}else{
-
-  				$stock = "<button class='btn btn-success'>".$productos[$i]["stock"]."</button>";
-
-  			}
-
-		  	/*=============================================
- 	 		TRAEMOS LAS ACCIONES
-  			=============================================*/ 
-
-  			if(isset($_GET["perfilOculto"]) && $_GET["perfilOculto"] == "Especial"){
-
-  				$botones =  "<div class='btn-group'><button class='btn btn-warning btnEditarProducto' idProducto='".$productos[$i]["id"]."' data-toggle='modal' data-target='#modalEditarProducto'><i class='fa fa-pencil'></i></button></div>"; 
-
-  			}else{
-
-  				 $botones =  "<div class='btn-group'><button class='btn btn-warning btnEditarProducto' idProducto='".$productos[$i]["id"]."' data-toggle='modal' data-target='#modalEditarProducto'><i class='fa fa-pencil'></i></button><button class='btn btn-danger btnEliminarProducto' idProducto='".$productos[$i]["id"]."' codigo='".$productos[$i]["codigo"]."' imagen='".$productos[$i]["imagen"]."'><i class='fa fa-times'></i></button></div>"; 
-
-  			}
-
-		 
-		  	$datosJson .='[
-			      "'.($i+1).'",
-			      "'.$imagen.'",
-			      "'.$productos[$i]["lote"].'",
-			      "'.$productos[$i]["codigo"].'",
-
-			      "<b>'.$productos[$i]["descripcion"].'</b> <br>'.$categorias["categoria"].'",
-			 
-			      "'.$stock.'",
-		
-			      "'.$productos[$i]["precio_compra"].'",
-			      "'.$productos[$i]["precio_venta"].'",
-			      "'.$productos[$i]["fecha"].'",
-			      "'.$botones.'"
-			    ],';
-
-			}
-
-		  }
-
-		  $datosJson = substr($datosJson, 0, -1);
-
-		 $datosJson .=   '] 
-
-		 }';
-		
-		echo $datosJson;
-
-
-	}
-
-
-
+// Evita que espacios/BOM previos rompan el JSON
+if (function_exists('ob_get_level')) {
+  while (ob_get_level() > 0) @ob_end_clean();
 }
 
-/*=============================================
-ACTIVAR TABLA DE PRODUCTOS
-=============================================*/ 
-$activarProductos = new TablaProductos();
-$activarProductos -> mostrarTablaProductos();
+if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
 
+try {
+  require_once __DIR__."/../controladores/productos.controlador.php";
+  require_once __DIR__."/../modelos/productos.modelo.php";
+  require_once __DIR__."/../controladores/categorias.controlador.php";
+  require_once __DIR__."/../modelos/categorias.modelo.php";
+
+  $perfilOculto = isset($_GET['perfilOculto']) ? (string)$_GET['perfilOculto'] : '';
+
+  $productos = ControladorProductos::ctrMostrarProductos(null, null, "id");
+  if (!is_array($productos)) $productos = [];
+
+  $rows = [];
+  foreach ($productos as $i => $p) {
+
+    // Imagen segura
+    $img = trim($p["imagen"] ?? "");
+    if ($img === "") $img = "vistas/img/productos/default/anonymous.png";
+    $imgHtml = "<img src=\"".htmlspecialchars($img, ENT_QUOTES, 'UTF-8')."\" width=\"40\" style=\"height:40px;object-fit:cover;border-radius:4px\">";
+
+    // Categoría
+    $cat = "";
+    if (!empty($p["id_categoria"])) {
+      $catRow = ControladorCategorias::ctrMostrarCategorias("id", $p["id_categoria"]);
+      $cat = $catRow["categoria"] ?? "";
+    }
+    $descCat = "<b>".htmlspecialchars($p["descripcion"] ?? "", ENT_QUOTES, 'UTF-8')."</b>";
+    if ($cat !== "") $descCat .= "<br><small class='text-muted'>".htmlspecialchars($cat, ENT_QUOTES, 'UTF-8')."</small>";
+
+    // Stock semáforo
+    $stockNum = (int)($p["stock"] ?? 0);
+    if ($stockNum <= 10)      $stockHtml = "<button class='btn btn-danger'>".$stockNum."</button>";
+    elseif ($stockNum <= 15)  $stockHtml = "<button class='btn btn-warning'>".$stockNum."</button>";
+    else                      $stockHtml = "<button class='btn btn-success'>".$stockNum."</button>";
+
+    // Botones
+    if ($perfilOculto === "Especial") {
+      $botones = "<div class='btn-group'>
+        <button class='btn btn-warning btnEditarProducto' idProducto='".(int)$p["id"]."' data-toggle='modal' data-target='#modalEditarProducto'><i class='fa fa-pencil'></i></button>
+      </div>";
+    } else {
+      $botones = "<div class='btn-group'>
+        <button class='btn btn-warning btnEditarProducto' idProducto='".(int)$p["id"]."' data-toggle='modal' data-target='#modalEditarProducto'><i class='fa fa-pencil'></i></button>
+        <button class='btn btn-danger btnEliminarProducto' idProducto='".(int)$p["id"]."' codigo='".htmlspecialchars($p["codigo"] ?? "", ENT_QUOTES, 'UTF-8')."' imagen='".htmlspecialchars($p["imagen"] ?? "", ENT_QUOTES, 'UTF-8')."'><i class='fa fa-times'></i></button>
+      </div>";
+    }
+
+    $rows[] = [
+      (string)($i + 1),
+      $imgHtml,
+      htmlspecialchars($p["lote"]      ?? "", ENT_QUOTES, 'UTF-8'),
+      htmlspecialchars($p["codigo"]    ?? "", ENT_QUOTES, 'UTF-8'),
+      $descCat,
+      $stockHtml,
+      number_format((float)($p["precio_compra"] ?? 0), 2, '.', ''),
+      number_format((float)($p["precio_venta"]  ?? 0), 2, '.', ''),
+      htmlspecialchars($p["fecha"]     ?? "", ENT_QUOTES, 'UTF-8'),
+      $botones
+    ];
+  }
+
+  echo json_encode(["data" => $rows], JSON_UNESCAPED_UNICODE);
+
+} catch (Throwable $e) {
+  // Si algo explota, devolvemos JSON vacío con detalle (para depurar en Network)
+  http_response_code(500);
+  echo json_encode([
+    "data"  => [],
+    "error" => "datatable-productos: ".$e->getMessage()
+  ], JSON_UNESCAPED_UNICODE);
+}

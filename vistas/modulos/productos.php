@@ -326,16 +326,69 @@ if (!empty($_SESSION['perfil']) && in_array($_SESSION['perfil'], ['Vendedor','Of
   $eliminarProducto->ctrEliminarProducto();
 ?>
 
+
 <script>
-$(function(){
-  // Si no inicializas la DataTable en un JS global, puedes hacerlo aquí
-  if ($.fn.DataTable && !$.fn.dataTable.isDataTable('.tablaProductos')) {
-    $('.tablaProductos').DataTable({
-      pageLength: 10,
-      lengthChange: true,
-      order: [[0,'asc']],
-      language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' }
-    });
+/*  Este bloque:
+    1) Verifica que jQuery y DataTables estén cargados
+    2) Evita “already initialized”
+    3) Inicializa la tabla y muestra errores útiles en consola
+*/
+(function initProductosDT() {
+  // 0) Verificación: jQuery + DataTables cargados
+  if (typeof jQuery === 'undefined') {
+    console.error('jQuery no está cargado. Asegúrate de incluirlo ANTES de este bloque.');
+    return;
   }
-});
+  if (!jQuery.fn || !jQuery.fn.DataTable) {
+    console.error('DataTables no está cargado. Incluye los JS/CSS de DataTables antes del init.');
+    return;
+  }
+  jQuery.fn.dataTable.ext.errMode = 'console';
+
+  jQuery(function ($) {
+    var perfil = $('#perfilOculto').val() || '';
+    var $tabla = $('.tablaProductos');
+
+    // 1) Evita re-inicializar
+    if ($.fn.dataTable.isDataTable($tabla)) {
+      $tabla.DataTable().destroy();
+      $tabla.find('tbody').empty();
+    }
+
+    // 2) Inicializa con AJAX
+    $tabla.DataTable({
+      ajax: {
+        url: 'ajax/datatable-productos.ajax.php',
+        type: 'GET',
+        data: { perfilOculto: perfil },
+        dataSrc: function (json) {
+          // Si el PHP imprimió un Notice/Warning, verás HTML aquí
+          if (!json || typeof json !== 'object') {
+            console.error('Respuesta no JSON de datatable-productos.ajax.php:', json);
+            return [];
+          }
+          if (!('data' in json)) {
+            console.error('JSON sin propiedad "data":', json);
+            return [];
+          }
+          return json.data;
+        },
+        error: function (xhr) {
+          console.error('AJAX error datatable-productos.ajax.php',
+            { status: xhr.status, statusText: xhr.statusText, body: xhr.responseText });
+        }
+      },
+      deferRender: true,
+      retrieve: true,
+      processing: true,
+      responsive: true,
+      order: [[0, 'asc']],
+      language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' }
+      // Si el AJAX devuelve ya filas "listas" (arrays/cadenas HTML), no declares "columns".
+      // Si devolviera objetos: usa columns: [...]
+    });
+  });
+})();
 </script>
+
+

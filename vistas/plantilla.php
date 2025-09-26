@@ -10,6 +10,8 @@ session_start();
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <link rel="icon" href="vistas/img/plantilla/logo.png" type="image/png" />
 
+  
+
   <!-- =========================
        CSS (orden correcto)
        ========================= -->
@@ -24,8 +26,10 @@ session_start();
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.18/css/skins/skin-blue.min.css" />
 
   <!-- Plugins que realmente uses (sin duplicados) -->
-  <link rel="stylesheet" href="vistas/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css" />
-  <link rel="stylesheet" href="vistas/bower_components/datatables.net-bs/css/responsive.bootstrap.min.css" />
+  <!-- DataTables + Responsive (CDN confiable) -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap.min.css">
+
   <link rel="stylesheet" href="vistas/plugins/iCheck/all.css" />
   <link rel="stylesheet" href="vistas/bower_components/bootstrap-daterangepicker/daterangepicker.css" />
   <link rel="stylesheet" href="vistas/bower_components/morris.js/morris.css" />
@@ -90,10 +94,12 @@ session_start();
 
 <!-- Plugins (una sola vez cada uno) -->
 <script src="vistas/bower_components/fastclick/lib/fastclick.js"></script>
-<script src="vistas/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
-<script src="vistas/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-<script src="vistas/bower_components/datatables.net-bs/js/dataTables.responsive.min.js"></script>
-<script src="vistas/bower_components/datatables.net-bs/js/responsive.bootstrap.min.js"></script>
+<!-- DataTables + Responsive (CDN) -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap.min.js"></script>
+
 
 <!-- SweetAlert2 -->
 <script src="vistas/plugins/sweetalert2/sweetalert2.all.js"></script>
